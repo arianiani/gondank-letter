@@ -9,23 +9,24 @@ import weka.classifiers.Evaluation;
 import weka.classifiers.lazy.IBk;
 import weka.core.Instances;
 
-public class HKNNClassifier extends IBk {    
+public class HKNNClassifier extends IBk {                    
     
+    //FIXME : filename nanti diganti, soalnya kelas ini nantinya ada di server
     public HKNNClassifier(int k) {
         super(k);
     }    
-    
+        
     public static void main(String[] args) {
         try {
             HKNNClassifier hknn  = new HKNNClassifier(3);
             
             //parse file input
             BufferedReader reader = new BufferedReader(new FileReader("letter-recognition.arff"));
-            Instances trainingSet = new Instances(reader);
+            Instances trainingSet = new Instances(reader);            
             reader.close();                        
             
             //set class attribute           
-            trainingSet.setClass(trainingSet.attribute("lettr"));                        
+            trainingSet.setClass(trainingSet.attribute("lettr"));                                                            
             
             //cross validation (gak boleh ditrain classifier sebelumnya!) 
             Evaluation crosseval = new Evaluation(trainingSet);
