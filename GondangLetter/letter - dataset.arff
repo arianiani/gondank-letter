@@ -1,0 +1,22 @@
+@relation letter-recognition
+
+@attribute lettr {T,I,D,N,G,S,B,A,J,M,X,O,R,F,C,H,W,L,P,E,V,Y,Q,U,K,Z}
+@attribute ' x_box' numeric
+@attribute ' y_box' numeric
+@attribute ' width' numeric
+@attribute ' high' numeric
+@attribute ' onpix' numeric
+@attribute ' x_bar' numeric
+@attribute ' y_bar' numeric
+@attribute ' x2bar' numeric
+@attribute ' y2bar' numeric
+@attribute ' xybar' numeric
+@attribute ' x2ybr' numeric
+@attribute ' xy2br' numeric
+@attribute ' x_ege' numeric
+@attribute ' xegvy' numeric
+@attribute ' y_ege' numeric
+@attribute ' yegvx' numeric
+
+@data
+?,3,9,5,7,4,8,7,3,8,5,6,8,2,8,6,7
