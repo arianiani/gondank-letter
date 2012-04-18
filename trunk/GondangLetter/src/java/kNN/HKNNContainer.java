@@ -1,10 +1,13 @@
 package kNN;
 
+import preprocess.PrepUtil;
+import evaluation.EvalUtil;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Random;
-import weka.classifiers.Evaluation;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import util.FileUtil;
 import weka.core.Instances;
 import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.Remove;
@@ -36,8 +39,8 @@ public class HKNNContainer {
             mHKNNClassifier = new HKNNClassifier(k);
             
             //ambil file input training set
-            reader = new BufferedReader(new FileReader("letter-recognition.arff"));
-            trainingSet = new Instances(reader);
+            reader = new BufferedReader(new FileReader(filename));
+            trainingSet = new Instances(reader);            
             reader.close();
             
             //set class attribute           
@@ -66,10 +69,10 @@ public class HKNNContainer {
     public void run() {
         switch(testOption) {
             case CROSS_VALIDATION : 
-                crossValidation((int)testOptionVal);
+                EvalUtil.crossValidation(mHKNNClassifier, trainingSet, (int)testOptionVal);
                 break;
             case PERCENTAGE_SPLIT : 
-                percentageSplit(testOptionVal);
+                EvalUtil.percentageSplit(mHKNNClassifier, trainingSet, testOptionVal);
                 break;               
         }
     }
@@ -81,42 +84,51 @@ public class HKNNContainer {
         } catch (Exception ex) {
             System.err.println("err : " + ex.getMessage());                
         }
-    }
-     
-    //kalo make crossValidation, mHKNNClassifier gak boleh di-train sebelumnya
-    public void crossValidation(int fold) {
-        try {            
-            Evaluation crosseval = new Evaluation(trainingSet);            
-            crosseval.crossValidateModel(mHKNNClassifier, trainingSet, fold, new Random(1));            
-            System.out.println(crosseval.toSummaryString("\nHasil dari Cross-Validation dengan "+ fold + " fold\n=========\n",false));
-        } catch (Exception ex) {
-            System.err.println("err : " + ex.getMessage());
-        }
-    }    
+    }        
     
-    public void percentageSplit(float trainingPercent) {
-        try {
-            int trainingSize = (int) Math.round(trainingSet.numInstances() * trainingPercent / 100);
-            int testSize = trainingSet.numInstances() - trainingSize;
-            Instances train = new Instances(trainingSet, 0, trainingSize);        
-            Instances test = new Instances(trainingSet, trainingSize, testSize);
-            mHKNNClassifier.buildClassifier(train);
-            Evaluation eval = new Evaluation(train);
-            eval.evaluateModel(mHKNNClassifier, test);
-            System.out.println(eval.toSummaryString("\nHasil dari percentage split dengan " + trainingPercent + "% training size. Results\n=========\n",false));                                                                                          
-        } catch (Exception ex) {
-            System.err.println("err : " + ex.getMessage());
-        }
-        
+    public String outputModel() {
+        return mHKNNClassifier.toString(); 
     }
+    
+    public HKNNClassifier getClassifier() {        
+        return mHKNNClassifier;
+    }
+    
+    public Instances getTrainingSet() {
+        return trainingSet;
+    }       
     
     public static void main(String[] args) {
         
-        int[] removedAttributes = new int[] {};
-        int classIndex = 0; // indeks pertama
+        int[] removedAttributes = new int[] {};    
         
-        HKNNContainer hc = new HKNNContainer(3, "letter-recognition.arff", removedAttributes, classIndex, CROSS_VALIDATION, 10);
-        hc.run();                
+        System.out.println("=====TES PERCENTAGE SPLIT======");
+        HKNNContainer hc = new HKNNContainer(1, "contact-lenses.arff", removedAttributes, 4, PERCENTAGE_SPLIT, 66);
+        hc.run();  
+        
+        System.out.println("=====TES USE TRAINING SET=======");
+        
+        
+        System.out.println("====OUTPUT MODEL=======");
+        HKNNContainer hc2 = new HKNNContainer(3, "contact-lenses.arff", removedAttributes, 4, NONE, 0);
+        hc2.trainModel();
+        hc2.outputModel();
+        
+        System.out.println("====TES DISCRETIZE======");
+        HKNNContainer hc3 = new HKNNContainer(1, "letter-recognition.arff", removedAttributes, 0, NONE, 0);
+        Instances discdata = PrepUtil.unsupervisedDiscretize(hc3.getTrainingSet());        
+        try {
+            FileUtil.saveInstances(discdata, "test-discretize.arff");            
+        } catch (Exception ex) {            
+        }
+        
+        System.out.println("====TES NORMALIZE======");
+        HKNNContainer hc4 = new HKNNContainer(1, "letter-recognition.arff", removedAttributes, 0, NONE, 0);
+        Instances normdata = PrepUtil.unsupervisedNormalize(hc3.getTrainingSet());
+        try {
+            FileUtil.saveInstances(normdata, "test-normalize.arff");            
+        } catch (Exception ex) {            
+        }
     }
     
 }
