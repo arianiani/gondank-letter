@@ -80,6 +80,7 @@ public class HKNNContainer {
     }        
     
     //sebelumnya classifier harus di-train terlebih dahulu
+    //jika learn true, maka test set tersebut akan dimasukkan ke training set
     public Instances classifyData(Instances data, boolean learn) throws Exception {
         // create copy
         Instances labeled = new Instances(data);
@@ -88,7 +89,11 @@ public class HKNNContainer {
         for (int i = 0; i < data.numInstances(); i++) {            
             double clsLabel = mHKNNClassifier.classifyInstance(data.instance(i));
             labeled.instance(i).setClassValue(clsLabel);            
-        }
+            if(learn) {
+                mHKNNClassifier.updateClassifier(labeled.instance(i));
+            }
+        }               
+        
         return labeled;
     }
     
@@ -106,11 +111,11 @@ public class HKNNContainer {
 
         System.out.println("=====TES PERCENTAGE SPLIT======");
         HKNNContainer hc = new HKNNContainer(1, "contact-lenses.arff", removedAttributes, 4);
-        EvalUtil.percentageSplit(hc.getClassifier(), hc.getTrainingSet(), 66);
+        System.out.println(EvalUtil.percentageSplit(hc.getClassifier(), hc.getTrainingSet(), 66));
 
         System.out.println("=====TES USE TRAINING SET=======");
         HKNNContainer hct = new HKNNContainer(3, "contact-lenses.arff", removedAttributes, 4);
-        EvalUtil.useTrainingSet(hct.getClassifier(), hct.getTrainingSet());
+        System.out.println(EvalUtil.useTrainingSet(hct.getClassifier(), hct.getTrainingSet()));
 
         System.out.println("====OUTPUT MODEL=======");
         HKNNContainer hc2 = new HKNNContainer(3, "contact-lenses.arff", removedAttributes, 4);
