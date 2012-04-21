@@ -83,32 +83,33 @@ public class HKNNContainer {
     public static void main(String[] args) {
         try {
             int[] removedAttributes = new int[] {};    
-            Instances trainingSet = FileUtil.loadInstances("contact-lenses.arff"); 
-            trainingSet.setClassIndex(4);
+            Instances trainingSet = FileUtil.loadInstances("letter-recognition.arff"); 
+            //Instances trainingSet = FileUtil.loadInstances("contact-lenses.arff"); 
+            trainingSet.setClassIndex(0);
             
-            System.out.println("====TES classify=======");
-            HKNNContainer hcc = new HKNNContainer(2, trainingSet, removedAttributes, 4);        
-            hcc.trainModel();
-            Instances testdata=null;
-            try {
-                testdata = FileUtil.loadInstances("contact-lenses-testset.arff");
-                testdata.setClassIndex(4);
-            } catch (Exception ex) {
-                System.out.println("err : " + ex.getMessage());
-            }                                                 
-
-            Instances result = null;          
-            try {
-                result = hcc.classifyData(testdata, false);
-            } catch (Exception ex) {
-                Logger.getLogger(HKNNContainer.class.getName()).log(Level.SEVERE, null, ex);
-            }
-
-            System.out.println("result : ");
-            System.out.println(result.toString());
+//            System.out.println("====TES classify=======");
+//            HKNNContainer hcc = new HKNNContainer(2, trainingSet, removedAttributes, 4);        
+//            hcc.trainModel();
+//            Instances testdata=null;
+//            try {
+//                testdata = FileUtil.loadInstances("contact-lenses-testset.arff");
+//                testdata.setClassIndex(4);
+//            } catch (Exception ex) {
+//                System.out.println("err : " + ex.getMessage());
+//            }                                                 
+//
+//            Instances result = null;          
+//            try {
+//                result = hcc.classifyData(testdata, false);
+//            } catch (Exception ex) {
+//                Logger.getLogger(HKNNContainer.class.getName()).log(Level.SEVERE, null, ex);
+//            }
+//
+//            System.out.println("result : ");
+//            System.out.println(result.toString());
             
             System.out.println("=====TES PERCENTAGE SPLIT======");
-            HKNNContainer hc = new HKNNContainer(1, trainingSet, removedAttributes, 4);
+            HKNNContainer hc = new HKNNContainer(1, trainingSet, removedAttributes, 0);
             System.out.println(EvalUtil.percentageSplit(hc.getClassifier(), hc.getTrainingSet(), 5));
 
             System.out.println("=====TES USE TRAINING SET=======");
