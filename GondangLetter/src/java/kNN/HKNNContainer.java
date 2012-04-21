@@ -3,6 +3,7 @@ package kNN;
 import evaluation.EvalUtil;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import preprocess.PrepUtil;
 import util.FileUtil;
 import weka.core.Instances;
 import weka.filters.Filter;
@@ -17,19 +18,7 @@ public class HKNNContainer {
     private int classIndex;
     
     private Instances trainingSet;   
-    
-    private int testOption;
-    
-    private float testOptionVal;
-    
-    public static final int NONE = 0;
-    
-    public static final int CROSS_VALIDATION = 1;
-    
-    public static final int PERCENTAGE_SPLIT = 2;     
-    
-    public static final int TRAINING_SET = 3;
-    
+            
     //sementara pake file
     public HKNNContainer(int k, Instances trainingSet, int[] removedAttributes, int classIndex) {                        
         try {
@@ -94,39 +83,11 @@ public class HKNNContainer {
     public static void main(String[] args) {
         try {
             int[] removedAttributes = new int[] {};    
-            Instances trainingSet = FileUtil.loadInstances("contact-lenses.arff");            
+            Instances trainingSet = FileUtil.loadInstances("contact-lenses.arff"); 
+            trainingSet.setClassIndex(4);
             
-            System.out.println("=====TES PERCENTAGE SPLIT======");
-            HKNNContainer hc = new HKNNContainer(1, trainingSet, removedAttributes, 4);
-            System.out.println(EvalUtil.percentageSplit(hc.getClassifier(), hc.getTrainingSet(), 66));
-
-            System.out.println("=====TES USE TRAINING SET=======");
-            HKNNContainer hct = new HKNNContainer(3, trainingSet, removedAttributes, 4);
-            System.out.println(EvalUtil.useTrainingSet(hct.getClassifier(), hct.getTrainingSet()));
-
-            System.out.println("====OUTPUT MODEL=======");
-            HKNNContainer hc2 = new HKNNContainer(3, trainingSet, removedAttributes, 4);
-            hc2.trainModel();
-            hc2.outputModel();
-
-            System.out.println("====TES DISCRETIZE======");
-    //        HKNNContainer hc3 = new HKNNContainer(1, trainingSet, removedAttributes, 0);
-    //        Instances discdata = PrepUtil.unsupervisedDiscretize(hc3.getTrainingSet());        
-    //        try {
-    //            FileUtil.saveInstances(discdata, "test-discretize.arff");            
-    //        } catch (Exception ex) {            
-    //        }
-
-            System.out.println("====TES NORMALIZE======");
-    //        HKNNContainer hc4 = new HKNNContainer(1, trainingSet, removedAttributes, 0);
-    //        Instances normdata = PrepUtil.unsupervisedNormalize(hc3.getTrainingSet());
-    //        try {
-    //            FileUtil.saveInstances(normdata, "test-normalize.arff");            
-    //        } catch (Exception ex) {            
-    //        }
-
             System.out.println("====TES classify=======");
-            HKNNContainer hcc = new HKNNContainer(1, trainingSet, removedAttributes, 4);        
+            HKNNContainer hcc = new HKNNContainer(2, trainingSet, removedAttributes, 4);        
             hcc.trainModel();
             Instances testdata=null;
             try {
@@ -145,6 +106,40 @@ public class HKNNContainer {
 
             System.out.println("result : ");
             System.out.println(result.toString());
+            
+            System.out.println("=====TES PERCENTAGE SPLIT======");
+            HKNNContainer hc = new HKNNContainer(1, trainingSet, removedAttributes, 4);
+            System.out.println(EvalUtil.percentageSplit(hc.getClassifier(), hc.getTrainingSet(), 5));
+
+            System.out.println("=====TES USE TRAINING SET=======");
+            HKNNContainer hct = new HKNNContainer(1, trainingSet, removedAttributes, 4);
+            System.out.println(EvalUtil.useTrainingSet(hct.getClassifier(), hct.getTrainingSet()));            
+            
+            System.out.println("=====TES CROSS VALIDATION=======");
+            HKNNContainer hccv = new HKNNContainer(1, trainingSet, removedAttributes, 4);
+            System.out.println(EvalUtil.crossValidation(hccv.getClassifier(), hccv.getTrainingSet(), 10));
+            
+            System.out.println("====OUTPUT MODEL=======");
+            HKNNContainer hc2 = new HKNNContainer(3, trainingSet, removedAttributes, 4);
+            hc2.trainModel();
+            hc2.outputModel();
+
+            System.out.println("====TES DISCRETIZE======");
+            HKNNContainer hc3 = new HKNNContainer(1, trainingSet, removedAttributes, 0);
+            Instances discdata = PrepUtil.unsupervisedDiscretize(hc3.getTrainingSet());        
+            try {
+                FileUtil.saveInstances(discdata, "test-discretize.arff");            
+            } catch (Exception ex) {            
+            }
+
+            System.out.println("====TES NORMALIZE======");
+            HKNNContainer hc4 = new HKNNContainer(1, trainingSet, removedAttributes, 0);
+            Instances normdata = PrepUtil.unsupervisedNormalize(hc3.getTrainingSet());
+            try {
+                FileUtil.saveInstances(normdata, "test-normalize.arff");            
+            } catch (Exception ex) {            
+            }
+            
         } catch (Exception ex) {
             Logger.getLogger(HKNNContainer.class.getName()).log(Level.SEVERE, null, ex);
         }

@@ -47,11 +47,10 @@ public class LinearKNearestNeighbourSearch implements Serializable {
             int i;
             for (i = 0; i < k && i<sel.size() &&  sel.get(i).distance < distance; i++) 
             ;
-
-            if ((i < k - 1) || (sel.size()>=k && i == k - 1 && distance == sel.get(i).distance) || (i==k-1 && sel.size() < k)) {
+            
+            if ((i < k) || (sel.size()>=k && i == k - 1 && distance == sel.get(i).distance)) {
                 sel.add(i, new Element(instance, distance, index));
             }
-
         }
 
         public ArrayList<Element> getInternalList() {
@@ -75,34 +74,36 @@ public class LinearKNearestNeighbourSearch implements Serializable {
         data.add(instance);
     }
 
-    public Instances kNearestNeighbours(Instance target, int k) {        
-        Instances ret = new Instances(data, 0);        
+    public Instances kNearestNeighbours(Instance target, int k) {                        
         SortedList sl = new SortedList(k);
-        for (int i = 0; i < data.numInstances(); i++) {
+        for (int i = 0; i < data.numInstances(); i++) {            
             sl.insert(data.instance(i), calcDistance(target, data.instance(i)), i);
-        }
-                
-        for(int i=0;i < k && i < sl.getInternalList().size() ;i++) {             
-            ret.add(sl.getInternalList().get(i).instance);
-        }                
+        }                                  
         
         int nnsize=sl.getInternalList().size();
         if(sl.getInternalList().size() > k) {
             int i = k;
-            while(i<sl.getInternalList().size() && Double.compare(sl.getInternalList().get(k-1).distance, sl.getInternalList().get(i).distance)==0) {
-                ret.add(sl.getInternalList().get(i).instance);
+            while(i<sl.getInternalList().size() && Double.compare(sl.getInternalList().get(k-1).distance, sl.getInternalList().get(i).distance)==0) {                
                 i++;
             } 
             nnsize = i;
         }                        
         
-        //sl.setInternalList((ArrayList)sl.getInternalList().subList(0, nnsize));
-        
-        //while
+        sl.setInternalList(new ArrayList(sl.getInternalList().subList(0, nnsize)));        
+        Instances ret = new Instances(data, sl.getInternalList().size());        
+        distances = new double[sl.getInternalList().size()];        
+        for(int i=0;i<distances.length;i++) {
+            distances[i] = sl.getInternalList().get(i).distance;
+            ret.add(sl.getInternalList().get(i).instance);            
+        }        
         
         return ret;
     }
 
+    public double[] getDistances() {
+        return distances;
+    }
+    
     //asumsi instance a dan b mempunyai urutan attribute yang sama dan class index yang sama
     //hanya mendukung tipe data numerik dan nominal
     //distance untuk nilai attribute yang sama menghasilkan jarak yang lebih pendek
