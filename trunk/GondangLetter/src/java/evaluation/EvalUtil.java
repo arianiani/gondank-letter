@@ -24,15 +24,19 @@ public class EvalUtil {
     }    
     
     public static String percentageSplit(Classifier classifier, Instances trainingSet, float trainingPercent) {
-        try {
+        try {            
             int trainingSize = (int) Math.round(trainingSet.numInstances() * trainingPercent / 100);
             int testSize = trainingSet.numInstances() - trainingSize;
             Instances train = new Instances(trainingSet, 0, trainingSize);        
             Instances test = new Instances(trainingSet, trainingSize, testSize);
             classifier.buildClassifier(train);
             Evaluation eval = new Evaluation(train);
-            eval.evaluateModel(classifier, test);            
-            return eval.toSummaryString("\nHasil dari percentage split dengan " + trainingPercent + "% training size. Results : \n",false);
+            eval.evaluateModel(classifier, test);                        
+            StringBuilder sb = new StringBuilder();
+            //sb.append("persentase benar : ").append(eval.pctCorrect()).append("\n");
+            //sb.append("persentase salah : ").append(eval.pctIncorrect()).append("\n");
+            sb.append(eval.toSummaryString("\nHasil dari percentage split dengan " + trainingPercent + "% training size. Results : \n",true));
+            return sb.toString();
         } catch (Exception ex) {
             System.err.println("err : " + ex.getMessage());
             return "";

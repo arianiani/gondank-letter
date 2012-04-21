@@ -19,45 +19,47 @@ public class HKNNClassifier extends IBk {
         linearSearch = new LinearKNearestNeighbourSearch();
     }
 
-//    @Override
-//    public void buildClassifier(Instances instances) throws Exception {     
-//        
-//        // can classifier handle the data?
-//        getCapabilities().testWithFail(instances);
-//
-//        // remove instances with missing class
-//        instances = new Instances(instances);
-//        instances.deleteWithMissingClass();
-//
-//        m_NumClasses = instances.numClasses();
-//        m_ClassType = instances.classAttribute().type();
-//        m_Train = new Instances(instances, 0, instances.numInstances());
-//
-//        for(int i=0;i<m_Train.numAttributes(); i++) {
-//            if((i!=m_Train.classIndex()) && 
-//                    (m_Train.attribute(i).isNominal() || 
-//                    m_Train.attribute(i).isNumeric())) {
-//                m_NumAttributesUsed ++;
-//            }
-//        }
-//        
-//        linearSearch.setInstaces(m_Train);
-//        
-//        // Invalidate any currently cross-validation selected k
-//        m_kNNValid = false;
-//    }
-//
-//    @Override
-//    public double[] distributionForInstance(Instance instance) throws Exception {
-//        if (m_Train.numInstances() == 0) {
-//            //throw new Exception("No training instances!");
-//            return m_defaultModel.distributionForInstance(instance);
-//        }
-//        
-//        Instances neighbours = linearSearch.kNearestNeighbours(instance, m_kNN);
-//        
-//        //return super.distributionForInstance(instance);
-//    }    
+    @Override
+    public void buildClassifier(Instances instances) throws Exception {     
+        
+        // can classifier handle the data?
+        getCapabilities().testWithFail(instances);
+
+        // remove instances with missing class
+        instances = new Instances(instances);
+        instances.deleteWithMissingClass();
+
+        m_NumClasses = instances.numClasses();
+        m_ClassType = instances.classAttribute().type();
+        m_Train = new Instances(instances, 0, instances.numInstances());
+
+        for(int i=0;i<m_Train.numAttributes(); i++) {
+            if((i!=m_Train.classIndex()) && 
+                    (m_Train.attribute(i).isNominal() || 
+                    m_Train.attribute(i).isNumeric())) {
+                m_NumAttributesUsed ++;
+            }
+        }
+        
+        linearSearch.setInstaces(m_Train);
+        
+        // Invalidate any currently cross-validation selected k
+        m_kNNValid = false;
+    }
+
+    @Override
+    public double[] distributionForInstance(Instance instance) throws Exception {
+        if (m_Train.numInstances() == 0) {
+            //throw new Exception("No training instances!");
+            return m_defaultModel.distributionForInstance(instance);
+        }
+        
+        Instances neighbours = linearSearch.kNearestNeighbours(instance, m_kNN);
+        double[] distances = linearSearch.getDistances();
+        double[] distribution = makeDistribution(neighbours, distances);
+                
+        return distribution;                
+    }    
     
     @Override
     public void updateClassifier(Instance instance) throws Exception {
@@ -68,7 +70,7 @@ public class HKNNClassifier extends IBk {
     
     public static void main(String[] args) {
         try {
-            HKNNClassifier hknn  = new HKNNClassifier(1);
+            HKNNClassifier hknn  = new HKNNClassifier(5);
             
             //parse file input
             BufferedReader reader = new BufferedReader(new FileReader("contact-lenses.arff"));
