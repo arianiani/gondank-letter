@@ -30,10 +30,12 @@ public class HKNNContainer {
     
     public static final int CROSS_VALIDATION = 1;
     
-    public static final int PERCENTAGE_SPLIT = 2;        
+    public static final int PERCENTAGE_SPLIT = 2;     
+    
+    public static final int TRAINING_SET = 3;
     
     //sementara pake file
-    public HKNNContainer(int k, String filename, int[] removedAttributes, int classIndex, int testOption, float testOptionVal) {        
+    public HKNNContainer(int k, String filename, int[] removedAttributes, int classIndex) {        
         BufferedReader reader = null;
         try {
             mHKNNClassifier = new HKNNClassifier(k);
@@ -52,9 +54,7 @@ public class HKNNContainer {
             r.setInputFormat(trainingSet);
             trainingSet = Filter.useFilter(trainingSet, r);                        
                         
-            System.out.println("jumlah attribute training set : " + trainingSet.numAttributes());            
-            this.testOption = testOption;
-            this.testOptionVal = testOptionVal;
+            System.out.println("jumlah attribute training set : " + trainingSet.numAttributes());                        
         } catch (Exception ex) {
             System.err.println("err : " + ex.getMessage());                
         } finally {
@@ -64,18 +64,7 @@ public class HKNNContainer {
                 System.err.println("err : " + ex.getMessage());                
             }
         }
-    }
-    
-    public void run() {
-        switch(testOption) {
-            case CROSS_VALIDATION : 
-                EvalUtil.crossValidation(mHKNNClassifier, trainingSet, (int)testOptionVal);
-                break;
-            case PERCENTAGE_SPLIT : 
-                EvalUtil.percentageSplit(mHKNNClassifier, trainingSet, testOptionVal);
-                break;               
-        }
-    }
+    }        
     
     //latih HKNNClassifier dengan trainingSet
     public void trainModel() {
@@ -88,6 +77,19 @@ public class HKNNContainer {
     
     public String outputModel() {
         return mHKNNClassifier.toString(); 
+    }        
+    
+    //sebelumnya classifier harus di-train terlebih dahulu
+    public Instances classifyData(Instances data, boolean learn) throws Exception {
+        // create copy
+        Instances labeled = new Instances(data);
+
+        // label instances
+        for (int i = 0; i < data.numInstances(); i++) {            
+            double clsLabel = mHKNNClassifier.classifyInstance(data.instance(i));
+            labeled.instance(i).setClassValue(clsLabel);            
+        }
+        return labeled;
     }
     
     public HKNNClassifier getClassifier() {        
@@ -101,34 +103,57 @@ public class HKNNContainer {
     public static void main(String[] args) {
         
         int[] removedAttributes = new int[] {};    
-        
+
         System.out.println("=====TES PERCENTAGE SPLIT======");
-        HKNNContainer hc = new HKNNContainer(1, "contact-lenses.arff", removedAttributes, 4, PERCENTAGE_SPLIT, 66);
-        hc.run();  
-        
+        HKNNContainer hc = new HKNNContainer(1, "contact-lenses.arff", removedAttributes, 4);
+        EvalUtil.percentageSplit(hc.getClassifier(), hc.getTrainingSet(), 66);
+
         System.out.println("=====TES USE TRAINING SET=======");
-        
-        
+        HKNNContainer hct = new HKNNContainer(3, "contact-lenses.arff", removedAttributes, 4);
+        EvalUtil.useTrainingSet(hct.getClassifier(), hct.getTrainingSet());
+
         System.out.println("====OUTPUT MODEL=======");
-        HKNNContainer hc2 = new HKNNContainer(3, "contact-lenses.arff", removedAttributes, 4, NONE, 0);
+        HKNNContainer hc2 = new HKNNContainer(3, "contact-lenses.arff", removedAttributes, 4);
         hc2.trainModel();
         hc2.outputModel();
-        
+
         System.out.println("====TES DISCRETIZE======");
-        HKNNContainer hc3 = new HKNNContainer(1, "letter-recognition.arff", removedAttributes, 0, NONE, 0);
-        Instances discdata = PrepUtil.unsupervisedDiscretize(hc3.getTrainingSet());        
-        try {
-            FileUtil.saveInstances(discdata, "test-discretize.arff");            
-        } catch (Exception ex) {            
-        }
-        
+//        HKNNContainer hc3 = new HKNNContainer(1, "letter-recognition.arff", removedAttributes, 0);
+//        Instances discdata = PrepUtil.unsupervisedDiscretize(hc3.getTrainingSet());        
+//        try {
+//            FileUtil.saveInstances(discdata, "test-discretize.arff");            
+//        } catch (Exception ex) {            
+//        }
+
         System.out.println("====TES NORMALIZE======");
-        HKNNContainer hc4 = new HKNNContainer(1, "letter-recognition.arff", removedAttributes, 0, NONE, 0);
-        Instances normdata = PrepUtil.unsupervisedNormalize(hc3.getTrainingSet());
+//        HKNNContainer hc4 = new HKNNContainer(1, "letter-recognition.arff", removedAttributes, 0);
+//        Instances normdata = PrepUtil.unsupervisedNormalize(hc3.getTrainingSet());
+//        try {
+//            FileUtil.saveInstances(normdata, "test-normalize.arff");            
+//        } catch (Exception ex) {            
+//        }
+
+        System.out.println("====TES classify=======");
+        HKNNContainer hcc = new HKNNContainer(1, "contact-lenses.arff", removedAttributes, 4);        
+        hcc.trainModel();
+        Instances testdata=null;
         try {
-            FileUtil.saveInstances(normdata, "test-normalize.arff");            
-        } catch (Exception ex) {            
+            testdata = FileUtil.loadInstances("contact-lenses-testset.arff");
+            testdata.setClassIndex(4);
+        } catch (Exception ex) {
+            System.out.println("err : " + ex.getMessage());
+        }                                                 
+
+        Instances result = null;          
+        try {
+            result = hcc.classifyData(testdata, false);
+        } catch (Exception ex) {
+            Logger.getLogger(HKNNContainer.class.getName()).log(Level.SEVERE, null, ex);
         }
+
+        System.out.println("result : ");
+        System.out.println(result.toString());            
+        
     }
     
 }
