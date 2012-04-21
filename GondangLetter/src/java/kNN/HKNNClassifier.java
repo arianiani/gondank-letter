@@ -7,17 +7,20 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import weka.classifiers.Evaluation;
 import weka.classifiers.lazy.IBk;
+import weka.core.Instance;
 import weka.core.Instances;
 
 public class HKNNClassifier extends IBk {                    
     
+    protected LinearSearch linearSearch;
+    
     public HKNNClassifier(int k) {
         super(k);
+        linearSearch = new LinearSearch();
     }
 
 //    @Override
-//    public void buildClassifier(Instances instances) throws Exception {
-//        //super.buildClassifier(instances);
+//    public void buildClassifier(Instances instances) throws Exception {     
 //        
 //        // can classifier handle the data?
 //        getCapabilities().testWithFail(instances);
@@ -26,8 +29,39 @@ public class HKNNClassifier extends IBk {
 //        instances = new Instances(instances);
 //        instances.deleteWithMissingClass();
 //
+//        m_NumClasses = instances.numClasses();
+//        m_ClassType = instances.classAttribute().type();
+//        m_Train = new Instances(instances, 0, instances.numInstances());
+//
+//        for(int i=0;i<m_Train.numAttributes(); i++) {
+//            if((i!=m_Train.classIndex()) && 
+//                    (m_Train.attribute(i).isNominal() || 
+//                    m_Train.attribute(i).isNumeric())) {
+//                m_NumAttributesUsed ++;
+//            }
+//        }
 //        
-//    }        
+//        linearSearch.setInstaces(m_Train);
+//        
+//        // Invalidate any currently cross-validation selected k
+//        m_kNNValid = false;
+//    }
+//
+//    @Override
+//    public double[] distributionForInstance(Instance instance) throws Exception {
+//        
+//        
+//        
+//        
+//        return super.distributionForInstance(instance);
+//    }    
+    
+    @Override
+    public void updateClassifier(Instance instance) throws Exception {
+        super.updateClassifier(instance);
+        
+        linearSearch.addInstance(instance);
+    }        
     
     public static void main(String[] args) {
         try {

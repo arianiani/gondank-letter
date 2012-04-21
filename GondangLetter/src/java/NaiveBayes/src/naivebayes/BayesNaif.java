@@ -2,10 +2,11 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package naivebayes;
+package NaiveBayes.src.naivebayes;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import weka.classifiers.bayes.NaiveBayes;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.converters.ConverterUtils.DataSource;
