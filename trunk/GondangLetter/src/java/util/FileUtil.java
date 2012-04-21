@@ -1,9 +1,7 @@
 package util;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
+import java.io.*;
+import weka.classifiers.Classifier;
 import weka.core.Instances;
 
 public class FileUtil {
@@ -17,7 +15,7 @@ public class FileUtil {
         writer.close();
     }
 
-    public static Instances loadInstances(Instances data, String filename) throws Exception {
+    public static Instances loadInstances(String filename) throws Exception {
         Instances result;
         BufferedReader reader;
 
@@ -28,4 +26,5 @@ public class FileUtil {
 
         return result;
     }
+       
 }

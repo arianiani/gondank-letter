@@ -11,22 +11,35 @@ import weka.core.Instances;
 
 public class HKNNClassifier extends IBk {                    
     
-    //FIXME : filename nanti diganti, soalnya kelas ini nantinya ada di server
     public HKNNClassifier(int k) {
         super(k);
-    }    
-        
+    }
+
+//    @Override
+//    public void buildClassifier(Instances instances) throws Exception {
+//        //super.buildClassifier(instances);
+//        
+//        // can classifier handle the data?
+//        getCapabilities().testWithFail(instances);
+//
+//        // remove instances with missing class
+//        instances = new Instances(instances);
+//        instances.deleteWithMissingClass();
+//
+//        
+//    }        
+    
     public static void main(String[] args) {
         try {
-            HKNNClassifier hknn  = new HKNNClassifier(3);
+            HKNNClassifier hknn  = new HKNNClassifier(1);
             
             //parse file input
-            BufferedReader reader = new BufferedReader(new FileReader("letter-recognition.arff"));
+            BufferedReader reader = new BufferedReader(new FileReader("contact-lenses.arff"));
             Instances trainingSet = new Instances(reader);            
             reader.close();                        
             
             //set class attribute           
-            trainingSet.setClass(trainingSet.attribute("lettr"));                                                            
+            trainingSet.setClass(trainingSet.attribute("contact-lenses"));                                                            
             
             //cross validation (gak boleh ditrain classifier sebelumnya!) 
             Evaluation crosseval = new Evaluation(trainingSet);
@@ -37,8 +50,8 @@ public class HKNNClassifier extends IBk {
             hknn.buildClassifier(trainingSet);                                    
             
             //buat instances dari dataset
-            Instances dataset = new Instances(new BufferedReader(new FileReader("letter - dataset.arff")));
-            dataset.setClass(dataset.attribute("lettr"));
+            Instances dataset = new Instances(new BufferedReader(new FileReader("contact-lenses-testset.arff")));
+            dataset.setClass(dataset.attribute("contact-lenses"));
             
             //buat copy dari dataset yang menyimpan hasil klasifikasi
             Instances labeled = new Instances(dataset);                 
