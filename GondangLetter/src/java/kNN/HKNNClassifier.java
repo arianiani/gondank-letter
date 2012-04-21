@@ -12,11 +12,11 @@ import weka.core.Instances;
 
 public class HKNNClassifier extends IBk {                    
     
-    protected LinearSearch linearSearch;
+    protected LinearKNearestNeighbourSearch linearSearch;
     
     public HKNNClassifier(int k) {
         super(k);
-        linearSearch = new LinearSearch();
+        linearSearch = new LinearKNearestNeighbourSearch();
     }
 
 //    @Override
@@ -49,11 +49,14 @@ public class HKNNClassifier extends IBk {
 //
 //    @Override
 //    public double[] distributionForInstance(Instance instance) throws Exception {
+//        if (m_Train.numInstances() == 0) {
+//            //throw new Exception("No training instances!");
+//            return m_defaultModel.distributionForInstance(instance);
+//        }
 //        
+//        Instances neighbours = linearSearch.kNearestNeighbours(instance, m_kNN);
 //        
-//        
-//        
-//        return super.distributionForInstance(instance);
+//        //return super.distributionForInstance(instance);
 //    }    
     
     @Override

@@ -1,10 +1,6 @@
 package kNN;
 
-import preprocess.PrepUtil;
 import evaluation.EvalUtil;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import util.FileUtil;
@@ -35,34 +31,24 @@ public class HKNNContainer {
     public static final int TRAINING_SET = 3;
     
     //sementara pake file
-    public HKNNContainer(int k, String filename, int[] removedAttributes, int classIndex) {        
-        BufferedReader reader = null;
+    public HKNNContainer(int k, Instances trainingSet, int[] removedAttributes, int classIndex) {                        
         try {
             mHKNNClassifier = new HKNNClassifier(k);
-            
-            //ambil file input training set
-            reader = new BufferedReader(new FileReader(filename));
-            trainingSet = new Instances(reader);            
-            reader.close();
-            
+
+            this.trainingSet = trainingSet;                        
+
             //set class attribute           
-            trainingSet.setClass(trainingSet.attribute(classIndex));                                                                                    
-            
+            this.trainingSet.setClass(this.trainingSet.attribute(classIndex));                                                                                    
+
             //remove attribute
             Remove r = new Remove();
             r.setAttributeIndicesArray(removedAttributes);
-            r.setInputFormat(trainingSet);
-            trainingSet = Filter.useFilter(trainingSet, r);                        
-                        
-            System.out.println("jumlah attribute training set : " + trainingSet.numAttributes());                        
+            r.setInputFormat(this.trainingSet);
+            this.trainingSet = Filter.useFilter(this.trainingSet, r);                        
+
+            System.out.println("jumlah attribute training set : " + this.trainingSet.numAttributes());
         } catch (Exception ex) {
-            System.err.println("err : " + ex.getMessage());                
-        } finally {
-            try {
-                reader.close();
-            } catch (IOException ex) {
-                System.err.println("err : " + ex.getMessage());                
-            }
+            Logger.getLogger(HKNNContainer.class.getName()).log(Level.SEVERE, null, ex);
         }
     }        
     
@@ -106,58 +92,62 @@ public class HKNNContainer {
     }       
     
     public static void main(String[] args) {
-        
-        int[] removedAttributes = new int[] {};    
-
-        System.out.println("=====TES PERCENTAGE SPLIT======");
-        HKNNContainer hc = new HKNNContainer(1, "contact-lenses.arff", removedAttributes, 4);
-        System.out.println(EvalUtil.percentageSplit(hc.getClassifier(), hc.getTrainingSet(), 66));
-
-        System.out.println("=====TES USE TRAINING SET=======");
-        HKNNContainer hct = new HKNNContainer(3, "contact-lenses.arff", removedAttributes, 4);
-        System.out.println(EvalUtil.useTrainingSet(hct.getClassifier(), hct.getTrainingSet()));
-
-        System.out.println("====OUTPUT MODEL=======");
-        HKNNContainer hc2 = new HKNNContainer(3, "contact-lenses.arff", removedAttributes, 4);
-        hc2.trainModel();
-        hc2.outputModel();
-
-        System.out.println("====TES DISCRETIZE======");
-//        HKNNContainer hc3 = new HKNNContainer(1, "letter-recognition.arff", removedAttributes, 0);
-//        Instances discdata = PrepUtil.unsupervisedDiscretize(hc3.getTrainingSet());        
-//        try {
-//            FileUtil.saveInstances(discdata, "test-discretize.arff");            
-//        } catch (Exception ex) {            
-//        }
-
-        System.out.println("====TES NORMALIZE======");
-//        HKNNContainer hc4 = new HKNNContainer(1, "letter-recognition.arff", removedAttributes, 0);
-//        Instances normdata = PrepUtil.unsupervisedNormalize(hc3.getTrainingSet());
-//        try {
-//            FileUtil.saveInstances(normdata, "test-normalize.arff");            
-//        } catch (Exception ex) {            
-//        }
-
-        System.out.println("====TES classify=======");
-        HKNNContainer hcc = new HKNNContainer(1, "contact-lenses.arff", removedAttributes, 4);        
-        hcc.trainModel();
-        Instances testdata=null;
         try {
-            testdata = FileUtil.loadInstances("contact-lenses-testset.arff");
-            testdata.setClassIndex(4);
-        } catch (Exception ex) {
-            System.out.println("err : " + ex.getMessage());
-        }                                                 
+            int[] removedAttributes = new int[] {};    
+            Instances trainingSet = FileUtil.loadInstances("contact-lenses.arff");            
+            
+            System.out.println("=====TES PERCENTAGE SPLIT======");
+            HKNNContainer hc = new HKNNContainer(1, trainingSet, removedAttributes, 4);
+            System.out.println(EvalUtil.percentageSplit(hc.getClassifier(), hc.getTrainingSet(), 66));
 
-        Instances result = null;          
-        try {
-            result = hcc.classifyData(testdata, false);
+            System.out.println("=====TES USE TRAINING SET=======");
+            HKNNContainer hct = new HKNNContainer(3, trainingSet, removedAttributes, 4);
+            System.out.println(EvalUtil.useTrainingSet(hct.getClassifier(), hct.getTrainingSet()));
+
+            System.out.println("====OUTPUT MODEL=======");
+            HKNNContainer hc2 = new HKNNContainer(3, trainingSet, removedAttributes, 4);
+            hc2.trainModel();
+            hc2.outputModel();
+
+            System.out.println("====TES DISCRETIZE======");
+    //        HKNNContainer hc3 = new HKNNContainer(1, trainingSet, removedAttributes, 0);
+    //        Instances discdata = PrepUtil.unsupervisedDiscretize(hc3.getTrainingSet());        
+    //        try {
+    //            FileUtil.saveInstances(discdata, "test-discretize.arff");            
+    //        } catch (Exception ex) {            
+    //        }
+
+            System.out.println("====TES NORMALIZE======");
+    //        HKNNContainer hc4 = new HKNNContainer(1, trainingSet, removedAttributes, 0);
+    //        Instances normdata = PrepUtil.unsupervisedNormalize(hc3.getTrainingSet());
+    //        try {
+    //            FileUtil.saveInstances(normdata, "test-normalize.arff");            
+    //        } catch (Exception ex) {            
+    //        }
+
+            System.out.println("====TES classify=======");
+            HKNNContainer hcc = new HKNNContainer(1, trainingSet, removedAttributes, 4);        
+            hcc.trainModel();
+            Instances testdata=null;
+            try {
+                testdata = FileUtil.loadInstances("contact-lenses-testset.arff");
+                testdata.setClassIndex(4);
+            } catch (Exception ex) {
+                System.out.println("err : " + ex.getMessage());
+            }                                                 
+
+            Instances result = null;          
+            try {
+                result = hcc.classifyData(testdata, false);
+            } catch (Exception ex) {
+                Logger.getLogger(HKNNContainer.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+            System.out.println("result : ");
+            System.out.println(result.toString());
         } catch (Exception ex) {
             Logger.getLogger(HKNNContainer.class.getName()).log(Level.SEVERE, null, ex);
         }
-
-        System.out.println("result : ");
-        System.out.println(result.toString());            
         
     }
     

@@ -61,4 +61,7 @@
 %
 young,myope,no,reduced,?
 young,myope,no,normal,?
-young,myope,yes,reduced,?
+young,hypermetrope,yes,reduced,?
+presbyopic, hypermetrope, yes, normal, ?
+young, hypermetrope, yes, normal, ?
+presbyopic, hypermetrope, yes, normal, ?

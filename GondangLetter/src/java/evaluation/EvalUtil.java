@@ -68,7 +68,7 @@ public class EvalUtil {
             training.setClassIndex(4);
             
             int[] removedAttributes = new int[] {};
-            HKNNContainer hcc = new HKNNContainer(1, "contact-lenses.arff", removedAttributes, 4);        
+            HKNNContainer hcc = new HKNNContainer(1, training, removedAttributes, 4);        
             hcc.trainModel();
             
             // set class attribute
