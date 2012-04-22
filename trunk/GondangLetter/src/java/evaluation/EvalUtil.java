@@ -16,7 +16,7 @@ public class EvalUtil {
         try {            
             Evaluation crosseval = new Evaluation(trainingSet);            
             crosseval.crossValidateModel(classifier, trainingSet, fold, new Random(1));                            
-            result.setPctCorrect(crosseval.pctCorrect());            
+            result.setPctCorrect(crosseval.pctCorrect());
             result.setPctIncorrect(crosseval.pctIncorrect());
             return crosseval.toSummaryString("\nHasil dari Cross-Validation dengan "+ fold + " fold\n=========\n",false); 
         } catch (Exception ex) {

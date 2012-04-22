@@ -16,6 +16,17 @@ public class PrepUtil {
         }
     }
     
+    public static Instances unsupervisedNumericToNominal(Instances data) {
+        try {
+            Filter filter = new weka.filters.unsupervised.attribute.NumericToNominal();
+            filter.setInputFormat(data);
+            return Filter.useFilter(data, filter);            
+        } catch (Exception ex) {
+            System.err.println("err : " + ex.getMessage());
+            return null;
+        }
+    }
+    
     public static Instances unsupervisedNormalize(Instances data) {
         try {           
             Filter filter = new weka.filters.unsupervised.attribute.Normalize();
