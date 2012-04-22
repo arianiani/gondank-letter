@@ -1,6 +1,7 @@
 package kNN;
 
 import evaluation.EvalUtil;
+import evaluation.Result;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import preprocess.PrepUtil;
@@ -83,50 +84,57 @@ public class HKNNContainer {
     public static void main(String[] args) {
         try {
             int[] removedAttributes = new int[] {};    
-            Instances trainingSet = FileUtil.loadInstances("letter-recognition.arff"); 
-            //Instances trainingSet = FileUtil.loadInstances("contact-lenses.arff"); 
-            trainingSet.setClassIndex(0);
+            //Instances trainingSet = FileUtil.loadInstances("letter-recognition.arff"); 
+            Instances trainingSet = FileUtil.loadInstances("contact-lenses.arff"); 
+            int classIndex = 4;
+            trainingSet.setClassIndex(classIndex);
             
-//            System.out.println("====TES classify=======");
-//            HKNNContainer hcc = new HKNNContainer(2, trainingSet, removedAttributes, 4);        
-//            hcc.trainModel();
-//            Instances testdata=null;
-//            try {
-//                testdata = FileUtil.loadInstances("contact-lenses-testset.arff");
-//                testdata.setClassIndex(4);
-//            } catch (Exception ex) {
-//                System.out.println("err : " + ex.getMessage());
-//            }                                                 
-//
-//            Instances result = null;          
-//            try {
-//                result = hcc.classifyData(testdata, false);
-//            } catch (Exception ex) {
-//                Logger.getLogger(HKNNContainer.class.getName()).log(Level.SEVERE, null, ex);
-//            }
-//
-//            System.out.println("result : ");
-//            System.out.println(result.toString());
+            System.out.println("====TES classify=======");
+            HKNNContainer hcc = new HKNNContainer(2, trainingSet, removedAttributes, classIndex);        
+            hcc.trainModel();
+            Instances testdata=null;
+            try {
+                testdata = FileUtil.loadInstances("contact-lenses-testset.arff");
+                testdata.setClassIndex(4);
+            } catch (Exception ex) {
+                System.out.println("err : " + ex.getMessage());
+            }                                                 
+
+            Instances result = null;          
+            try {
+                result = hcc.classifyData(testdata, false);
+            } catch (Exception ex) {
+                Logger.getLogger(HKNNContainer.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+            System.out.println("result : ");
+            System.out.println(result.toString());
             
             System.out.println("=====TES PERCENTAGE SPLIT======");
-            HKNNContainer hc = new HKNNContainer(1, trainingSet, removedAttributes, 0);
-            System.out.println(EvalUtil.percentageSplit(hc.getClassifier(), hc.getTrainingSet(), 5));
-
+            HKNNContainer hc = new HKNNContainer(1, trainingSet, removedAttributes, classIndex);
+            Result psResult = new Result();
+            System.out.println(EvalUtil.percentageSplit(hc.getClassifier(), hc.getTrainingSet(), 5, psResult));
+            System.out.println("akurasi (benar - salah) : " + psResult.getPctCorrect() + " - " + psResult.getPctIncorrect());
+            
             System.out.println("=====TES USE TRAINING SET=======");
-            HKNNContainer hct = new HKNNContainer(1, trainingSet, removedAttributes, 4);
-            System.out.println(EvalUtil.useTrainingSet(hct.getClassifier(), hct.getTrainingSet()));            
+            HKNNContainer hct = new HKNNContainer(1, trainingSet, removedAttributes, classIndex);
+            Result tsResult = new Result();
+            System.out.println(EvalUtil.useTrainingSet(hct.getClassifier(), hct.getTrainingSet(), tsResult));            
+            System.out.println("akurasi (benar - salah) : " + tsResult.getPctCorrect() + " - " + tsResult.getPctIncorrect());
             
             System.out.println("=====TES CROSS VALIDATION=======");
-            HKNNContainer hccv = new HKNNContainer(1, trainingSet, removedAttributes, 4);
-            System.out.println(EvalUtil.crossValidation(hccv.getClassifier(), hccv.getTrainingSet(), 10));
+            HKNNContainer hccv = new HKNNContainer(1, trainingSet, removedAttributes, classIndex);
+            Result cvResult = new Result();
+            System.out.println(EvalUtil.crossValidation(hccv.getClassifier(), hccv.getTrainingSet(), 10, cvResult));
+            System.out.println("akurasi (benar - salah) : " + cvResult.getPctCorrect() + " - " + cvResult.getPctIncorrect());
             
             System.out.println("====OUTPUT MODEL=======");
-            HKNNContainer hc2 = new HKNNContainer(3, trainingSet, removedAttributes, 4);
+            HKNNContainer hc2 = new HKNNContainer(3, trainingSet, removedAttributes, classIndex);
             hc2.trainModel();
             hc2.outputModel();
 
             System.out.println("====TES DISCRETIZE======");
-            HKNNContainer hc3 = new HKNNContainer(1, trainingSet, removedAttributes, 0);
+            HKNNContainer hc3 = new HKNNContainer(1, trainingSet, removedAttributes, classIndex);
             Instances discdata = PrepUtil.unsupervisedDiscretize(hc3.getTrainingSet());        
             try {
                 FileUtil.saveInstances(discdata, "test-discretize.arff");            
@@ -134,7 +142,7 @@ public class HKNNContainer {
             }
 
             System.out.println("====TES NORMALIZE======");
-            HKNNContainer hc4 = new HKNNContainer(1, trainingSet, removedAttributes, 0);
+            HKNNContainer hc4 = new HKNNContainer(1, trainingSet, removedAttributes, classIndex);
             Instances normdata = PrepUtil.unsupervisedNormalize(hc3.getTrainingSet());
             try {
                 FileUtil.saveInstances(normdata, "test-normalize.arff");            

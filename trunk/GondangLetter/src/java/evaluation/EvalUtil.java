@@ -12,10 +12,12 @@ import weka.core.Instances;
 public class EvalUtil {
 
     //kalo make crossValidation, mHKNNClassifier gak boleh di-train sebelumnya
-    public static String crossValidation(Classifier classifier, Instances trainingSet,int fold) {
+    public static String crossValidation(Classifier classifier, Instances trainingSet,int fold, Result result) {
         try {            
             Evaluation crosseval = new Evaluation(trainingSet);            
-            crosseval.crossValidateModel(classifier, trainingSet, fold, new Random(1));                
+            crosseval.crossValidateModel(classifier, trainingSet, fold, new Random(1));                            
+            result.setPctCorrect(crosseval.pctCorrect());            
+            result.setPctIncorrect(crosseval.pctIncorrect());
             return crosseval.toSummaryString("\nHasil dari Cross-Validation dengan "+ fold + " fold\n=========\n",false); 
         } catch (Exception ex) {
             System.err.println("err : " + ex.getMessage());
@@ -23,7 +25,7 @@ public class EvalUtil {
         }
     }    
     
-    public static String percentageSplit(Classifier classifier, Instances trainingSet, float trainingPercent) {
+    public static String percentageSplit(Classifier classifier, Instances trainingSet, float trainingPercent, Result result) {
         try {            
             int trainingSize = (int) Math.round(trainingSet.numInstances() * trainingPercent / 100);
             int testSize = trainingSet.numInstances() - trainingSize;
@@ -33,8 +35,8 @@ public class EvalUtil {
             Evaluation eval = new Evaluation(train);
             eval.evaluateModel(classifier, test);                        
             StringBuilder sb = new StringBuilder();
-            //sb.append("persentase benar : ").append(eval.pctCorrect()).append("\n");
-            //sb.append("persentase salah : ").append(eval.pctIncorrect()).append("\n");
+            result.setPctCorrect(eval.pctCorrect());
+            result.setPctIncorrect(eval.pctIncorrect());
             sb.append(eval.toSummaryString("\nHasil dari percentage split dengan " + trainingPercent + "% training size. Results : \n",true));
             return sb.toString();
         } catch (Exception ex) {
@@ -43,14 +45,17 @@ public class EvalUtil {
         }        
     }
     
-    public static String useTrainingSet(Classifier classifier, Instances trainingSet) {
+    public static String useTrainingSet(Classifier classifier, Instances trainingSet, Result result) {
         try {            
             Evaluation eval = new Evaluation(trainingSet);            
             classifier.buildClassifier(trainingSet);
             eval.evaluateModel(classifier, trainingSet);            
+            result.setPctCorrect(eval.pctCorrect());
+            result.setPctIncorrect(eval.pctIncorrect());            
             StringBuilder sb = new StringBuilder();
-            sb.append("persentase benar : ").append(eval.pctCorrect()).append("\n");
-            sb.append("persentase salah : ").append(eval.pctIncorrect()).append("\n");
+            //sb.append("persentase benar : ").append(eval.pctCorrect()).append("\n");
+            //sb.append("persentase salah : ").append(eval.pctIncorrect()).append("\n");
+            sb.append(eval.toSummaryString());
             return sb.toString();            
         } catch (Exception ex) {
             System.err.println("err : " + ex.getMessage());
