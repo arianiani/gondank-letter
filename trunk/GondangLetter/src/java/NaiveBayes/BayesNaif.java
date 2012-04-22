@@ -6,7 +6,6 @@ package naivebayes;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import weka.classifiers.bayes.NaiveBayes;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.converters.ConverterUtils.DataSource;
@@ -15,6 +14,7 @@ import weka.filters.supervised.attribute.AttributeSelection;
 import weka.filters.unsupervised.attribute.Discretize;
 import weka.filters.unsupervised.attribute.Normalize;
 import weka.filters.unsupervised.attribute.ReplaceMissingValues;
+import weka.classifiers.bayes.NaiveBayes;
 
 /**
  *
@@ -61,9 +61,14 @@ public class BayesNaif extends NaiveBayes {
     public float[][] pxegvy = new float[21][26];
     public float[][] py_ege = new float[21][26];
     public float[][] pyegvx = new float[21][26];
+    //akurasi
+    int same = 0;
+    int diff = 0;
+    int ID = 0; //1:Discretize; 2:Normalize; 3:ReplaceMissingValue; 4:AttributSelection
 
     //============coba buat matriks===========================
     public void mat(Instances ins) {
+        ID = 3;
         for (int i = 0; i < ins.numInstances(); i++) {
             String xx = ins.instance(i).toString(0);
             char xxx = xx.charAt(0);
@@ -581,8 +586,9 @@ public class BayesNaif extends NaiveBayes {
             }
         }
     }
-    
+
     public void matAtt(Instances ins) {
+        ID = 4;
         for (int i = 0; i < ins.numInstances(); i++) {
             String xx = ins.instance(i).toString(11);
             char xxx = xx.charAt(0);
@@ -954,8 +960,9 @@ public class BayesNaif extends NaiveBayes {
             }
         }
     }
-    
+
     public void matDis(Instances ins) {
+        ID = 1;
         for (int i = 0; i < ins.numInstances(); i++) {
             String xx = ins.instance(i).toString(0);
             char xxx = xx.charAt(0);
@@ -1475,8 +1482,9 @@ public class BayesNaif extends NaiveBayes {
             }
         }
     }
-    
+
     public void matNor(Instances ins) {
+        ID = 2;
         for (int i = 0; i < ins.numInstances(); i++) {
             String xx = ins.instance(i).toString(0);
             char xxx = xx.charAt(0);
@@ -1978,109 +1986,70 @@ public class BayesNaif extends NaiveBayes {
             }
         }
     }
-        
-    
+
     //========matriks probabilitas================================================
     public void matprob(Instances ins, int id) {
         switch (id) {
-            case 1 :
+            case 1:
                 matDis(ins);
                 break;
-            case 2 :
+            case 2:
                 matNor(ins);
                 break;
-            case 3 :
+            case 3:
                 mat(ins);
                 break;
-            case 4 :
+            case 4:
                 matAtt(ins);
                 break;
-        }        
+        }
         int totalsum = 0; //jumlah seluruh instance
-        for (int n=0; n<26; n++) {
+        for (int n = 0; n < 26; n++) {
             totalsum = totalsum + lettr[n];
         }
-        for (int j=0; j<26; j++) {
-            plettr[j] = (float)lettr[j] / totalsum;
-            for (int i=0; i<21; i++) {
-                switch (id) {
-                    case 1 :
-                        px_box[i][j] = (float) x_box[i][j] / lettr[j];
-                        py_box[i][j] = (float) y_box[i][j] / lettr[j];
-                        pwidth[i][j] = (float) width[i][j] / lettr[j];
-                        phigh[i][j] = (float) high[i][j] / lettr[j];
-                        ponpix[i][j] = (float) onpix[i][j] / lettr[j];
-                        px_bar[i][j] = (float) x_bar[i][j] / lettr[j];
-                        py_bar[i][j] = (float) y_bar[i][j] / lettr[j];
-                        px2bar[i][j] = (float) x2bar[i][j] / lettr[j];
-                        py2bar[i][j] = (float) y2bar[i][j] / lettr[j];
-                        pxybar[i][j] = (float) xybar[i][j] / lettr[j];
-                        px2ybr[i][j] = (float) x2ybr[i][j] / lettr[j];
-                        pxy2br[i][j] = (float) xy2br[i][j] / lettr[j];
-                        px_ege[i][j] = (float) x_ege[i][j] / lettr[j];
-                        pxegvy[i][j] = (float) xegvy[i][j] / lettr[j];
-                        py_ege[i][j] = (float) y_ege[i][j] / lettr[j];
-                        pyegvx[i][j] = (float) yegvx[i][j] / lettr[j];
-                        break;
-                    case 2:
-                        px_box[i][j] = (float) x_box[i][j] / lettr[j];
-                        py_box[i][j] = (float) y_box[i][j] / lettr[j];
-                        pwidth[i][j] = (float) width[i][j] / lettr[j];
-                        phigh[i][j] = (float) high[i][j] / lettr[j];
-                        ponpix[i][j] = (float) onpix[i][j] / lettr[j];
-                        px_bar[i][j] = (float) x_bar[i][j] / lettr[j];
-                        py_bar[i][j] = (float) y_bar[i][j] / lettr[j];
-                        px2bar[i][j] = (float) x2bar[i][j] / lettr[j];
-                        py2bar[i][j] = (float) y2bar[i][j] / lettr[j];
-                        pxybar[i][j] = (float) xybar[i][j] / lettr[j];
-                        px2ybr[i][j] = (float) x2ybr[i][j] / lettr[j];
-                        pxy2br[i][j] = (float) xy2br[i][j] / lettr[j];
-                        px_ege[i][j] = (float) x_ege[i][j] / lettr[j];
-                        pxegvy[i][j] = (float) xegvy[i][j] / lettr[j];
-                        py_ege[i][j] = (float) y_ege[i][j] / lettr[j];
-                        pyegvx[i][j] = (float) yegvx[i][j] / lettr[j];
-                        break;
-                    case 3:
-                        px_box[i][j] = (float) x_box[i][j] / lettr[j];
-                        py_box[i][j] = (float) y_box[i][j] / lettr[j];
-                        pwidth[i][j] = (float) width[i][j] / lettr[j];
-                        phigh[i][j] = (float) high[i][j] / lettr[j];
-                        ponpix[i][j] = (float) onpix[i][j] / lettr[j];
-                        px_bar[i][j] = (float) x_bar[i][j] / lettr[j];
-                        py_bar[i][j] = (float) y_bar[i][j] / lettr[j];
-                        px2bar[i][j] = (float) x2bar[i][j] / lettr[j];
-                        py2bar[i][j] = (float) y2bar[i][j] / lettr[j];
-                        pxybar[i][j] = (float) xybar[i][j] / lettr[j];
-                        px2ybr[i][j] = (float) x2ybr[i][j] / lettr[j];
-                        pxy2br[i][j] = (float) xy2br[i][j] / lettr[j];
-                        px_ege[i][j] = (float) x_ege[i][j] / lettr[j];
-                        pxegvy[i][j] = (float) xegvy[i][j] / lettr[j];
-                        py_ege[i][j] = (float) y_ege[i][j] / lettr[j];
-                        pyegvx[i][j] = (float) yegvx[i][j] / lettr[j];
-                        break;
-                    case 4:
-                        px_box[i][j] = (float) 1;
-                        py_box[i][j] = (float) 1;
-                        pwidth[i][j] = (float) 1;
-                        phigh[i][j] = (float) high[i][j] / lettr[j];
-                        ponpix[i][j] = (float) 1;
-                        px_bar[i][j] = (float) 1;
-                        py_bar[i][j] = (float) y_bar[i][j] / lettr[j];
-                        px2bar[i][j] = (float) x2bar[i][j] / lettr[j];
-                        py2bar[i][j] = (float) y2bar[i][j] / lettr[j];
-                        pxybar[i][j] = (float) xybar[i][j] / lettr[j];
-                        px2ybr[i][j] = (float) x2ybr[i][j] / lettr[j];
-                        pxy2br[i][j] = (float) xy2br[i][j] / lettr[j];
-                        px_ege[i][j] = (float) x_ege[i][j] / lettr[j];
-                        pxegvy[i][j] = (float) xegvy[i][j] / lettr[j];
-                        py_ege[i][j] = (float) y_ege[i][j] / lettr[j];
-                        pyegvx[i][j] = (float) yegvx[i][j] / lettr[j];
-                        break;
+        for (int j = 0; j < 26; j++) {
+            plettr[j] = (float) lettr[j] / totalsum;
+            for (int i = 0; i < 21; i++) {
+                if ((id == 1) || (id == 2) || (id == 3)) {
+                    px_box[i][j] = (float) x_box[i][j] / lettr[j];
+                    py_box[i][j] = (float) y_box[i][j] / lettr[j];
+                    pwidth[i][j] = (float) width[i][j] / lettr[j];
+                    phigh[i][j] = (float) high[i][j] / lettr[j];
+                    ponpix[i][j] = (float) onpix[i][j] / lettr[j];
+                    px_bar[i][j] = (float) x_bar[i][j] / lettr[j];
+                    py_bar[i][j] = (float) y_bar[i][j] / lettr[j];
+                    px2bar[i][j] = (float) x2bar[i][j] / lettr[j];
+                    py2bar[i][j] = (float) y2bar[i][j] / lettr[j];
+                    pxybar[i][j] = (float) xybar[i][j] / lettr[j];
+                    px2ybr[i][j] = (float) x2ybr[i][j] / lettr[j];
+                    pxy2br[i][j] = (float) xy2br[i][j] / lettr[j];
+                    px_ege[i][j] = (float) x_ege[i][j] / lettr[j];
+                    pxegvy[i][j] = (float) xegvy[i][j] / lettr[j];
+                    py_ege[i][j] = (float) y_ege[i][j] / lettr[j];
+                    pyegvx[i][j] = (float) yegvx[i][j] / lettr[j];
+                } else if (id == 4) {
+                    px_box[i][j] = (float) 1;
+                    py_box[i][j] = (float) 1;
+                    pwidth[i][j] = (float) 1;
+                    phigh[i][j] = (float) high[i][j] / lettr[j];
+                    ponpix[i][j] = (float) 1;
+                    px_bar[i][j] = (float) 1;
+                    py_bar[i][j] = (float) y_bar[i][j] / lettr[j];
+                    px2bar[i][j] = (float) x2bar[i][j] / lettr[j];
+                    py2bar[i][j] = (float) y2bar[i][j] / lettr[j];
+                    pxybar[i][j] = (float) xybar[i][j] / lettr[j];
+                    px2ybr[i][j] = (float) x2ybr[i][j] / lettr[j];
+                    pxy2br[i][j] = (float) xy2br[i][j] / lettr[j];
+                    px_ege[i][j] = (float) x_ege[i][j] / lettr[j];
+                    pxegvy[i][j] = (float) xegvy[i][j] / lettr[j];
+                    py_ege[i][j] = (float) y_ege[i][j] / lettr[j];
+                    pyegvx[i][j] = (float) yegvx[i][j] / lettr[j];
                 }
             }
         }
     }
 
+    //ada validasi
     public float clasIns(Instance ins) {
         float max = 0;
         boolean val = true;
@@ -2097,12 +2066,13 @@ public class BayesNaif extends NaiveBayes {
         return max;
     }
 
+    //dasar
     public float learn(Instance ins) {
         float[] prb = new float[26];
         float max = 0;
         if (ins.isMissing(0)) {
-            for (int i=0; i<26; i++) {
-                prb[i] = plettr[i] * px_box[Integer.parseInt(ins.toString(1))][i] 
+            for (int i = 0; i < 26; i++) {
+                prb[i] = plettr[i] * px_box[Integer.parseInt(ins.toString(1))][i]
                         * py_box[Integer.parseInt(ins.toString(2))][i]
                         * pwidth[Integer.parseInt(ins.toString(3))][i]
                         * phigh[Integer.parseInt(ins.toString(4))][i]
@@ -2127,142 +2097,262 @@ public class BayesNaif extends NaiveBayes {
         }
         return max;
     }
-        
+
     public float carimax(float[] tf) {
-        float max=tf[0];
+        float max = tf[0];
         clsf = 65;
-        for (int i=1; i<tf.length; i++) {
+        for (int i = 1; i < tf.length; i++) {
             if (tf[i] > max) {
                 max = tf[i];
-                clsf = (char) (65+i);
+                clsf = (char) (65 + i);
             }
         }
         return max;
     }
-    
+
+    //buat instances
     public void classfy(Instances inss) {
-        for (int i=0; i<inss.numInstances(); i++) {
-            System.out.println("untuk instance ke-"+(i+1));
-            System.out.println("max value : "+clasIns(inss.instance(i)));
-            System.out.println("class : "+clsf);            
+        if (validateDataTest(inss)) {
+            for (int i = 0; i < inss.numInstances(); i++) {
+                System.out.println("untuk instance ke-" + (i + 1));
+                System.out.println("max value : " + clasIns(inss.instance(i)));
+                System.out.println("class : " + clsf);
+            }
+        } else {
+            System.out.println("Data tes yang dimasukkan tidak sesuai");
         }
     }
     
+    //validasi data test
+    public boolean validateDataTest(Instances ins) {
+        boolean val = true;
+        if (ID == 1) { //dis
+            for (int i = 0; i < ins.numInstances(); i++) {
+                if ((!"'\\'(-inf-1.5]\\''".equals(ins.instance(i).attribute(1).toString()))
+                        || (!"'\\'(1.5-3]\\''".equals(ins.instance(i).attribute(1).toString()))
+                        || (!"'\\'(3-4.5]\\''".equals(ins.instance(i).attribute(1).toString()))
+                        || (!"'\\'(4.5-6]\\''".equals(ins.instance(i).attribute(1).toString()))
+                        || (!"'\\'(6-7.5]\\''".equals(ins.instance(i).attribute(1).toString()))
+                        || (!"'\\'(7.5-9]\\''".equals(ins.instance(i).attribute(1).toString()))
+                        || (!"'\\'(9-10.5]\\''".equals(ins.instance(i).attribute(1).toString()))
+                        || (!"'\\'(10.5-12]\\''".equals(ins.instance(i).attribute(1).toString()))
+                        || (!"'\\'(12-13.5]\\''".equals(ins.instance(i).attribute(1).toString()))
+                        || (!"'\\'(13.5-inf]\\''".equals(ins.instance(i).attribute(1).toString()))) {
+                    val = false;
+                }
+            }
+        } else if (ID == 2) { //nor
+            for (int i = 0; i<ins.numInstances(); i++) {
+                for (int j = 1; j<17; j++) {
+                    if (Double.valueOf(ins.instance(i).toString(j))>1) {
+                        val = false;
+                    }                    
+                }
+            }
+        } else if (ID == 3) { //rep
+            
+        } else if (ID==4) { //att
+            if (ins.numAttributes()!=11) {
+               val = false; 
+            } else {
+                for (int i=0; i<ins.numInstances(); i++) {
+                    for (int j=1; j<10; j++) {
+                        if (!ins.instance(i).attribute(j).isNumeric()) {
+                            val = false;
+                        }
+                    }
+                }
+            }
+        }
+        return val;
+    }
+
     //=========================preprocess===========================================
-    
-    public void preprosesDis (Instances ins) throws Exception {
+    public void preprosesDis(Instances ins) throws Exception {
         Discretize indis = new Discretize();
         indis.setInputFormat(ins);
-        Instances prepIns = Filter.useFilter(ins,indis);        
+        Instances prepIns = Filter.useFilter(ins, indis);
         //matDis(prepIns);
         matprob(prepIns, 1);
+        makemodel(ins);
     }
-    
+
     public int parseDis(String norm) {
-        int idx=0;
-        if("'\\'(-inf-1.5]\\''".equals(norm)) {
+        int idx = 0;
+        if ("'\\'(-inf-1.5]\\''".equals(norm)) {
             idx = 0;
-        } else if("'\\'(1.5-3]\\''".equals(norm)) {
+        } else if ("'\\'(1.5-3]\\''".equals(norm)) {
             idx = 1;
-        } else if("'\\'(3-4.5]\\''".equals(norm)) {
+        } else if ("'\\'(3-4.5]\\''".equals(norm)) {
             idx = 2;
-        } else if("'\\'(4.5-6]\\''".equals(norm)) {
+        } else if ("'\\'(4.5-6]\\''".equals(norm)) {
             idx = 3;
-        } else if("'\\'(6-7.5]\\''".equals(norm)) {
+        } else if ("'\\'(6-7.5]\\''".equals(norm)) {
             idx = 4;
-        } else if("'\\'(7.5-9]\\''".equals(norm)) {
+        } else if ("'\\'(7.5-9]\\''".equals(norm)) {
             idx = 5;
-        } else if("'\\'(9-10.5]\\''".equals(norm)) {
+        } else if ("'\\'(9-10.5]\\''".equals(norm)) {
             idx = 6;
-        } else if("'\\'(10.5-12]\\''".equals(norm)) {
+        } else if ("'\\'(10.5-12]\\''".equals(norm)) {
             idx = 7;
-        } else if("'\\'(12-13.5]\\''".equals(norm)) {
+        } else if ("'\\'(12-13.5]\\''".equals(norm)) {
             idx = 8;
-        } else if("'\\'(13.5-inf]\\''".equals(norm)) {
+        } else if ("'\\'(13.5-inf]\\''".equals(norm)) {
             idx = 9;
         }
         return idx;
     }
-    
+
     //preprocess Normalize, ID 2
-    public void preprosesNor (Instances ins) throws Exception {
+    public void preprosesNor(Instances ins) throws Exception {
         Normalize inor = new Normalize();
         inor.setInputFormat(ins);
-        Instances prepIns = Filter.useFilter(ins,inor);        
-        matprob(prepIns, 2);        
+        Instances prepIns = Filter.useFilter(ins, inor);
+        matprob(prepIns, 2);
+        makemodel(ins);
     }
-    
+
     public int parseNor(String astr) {
-        int idx = (int)Math.round(Double.valueOf(astr)*15);
+        int idx = (int) Math.round(Double.valueOf(astr) * 15);
         return idx;
     }
-    
+
     //preprocess Replace missing value, ID 3
     public void preprosesRep(Instances ins) throws Exception { //ini doang yang bisa huhuhu :((
         ReplaceMissingValues inrep = new ReplaceMissingValues();
         inrep.setInputFormat(ins);
-        Instances prepIns = Filter.useFilter(ins,inrep);
+        Instances prepIns = Filter.useFilter(ins, inrep);
         matprob(prepIns, 3);
+        makemodel(ins);
     }
-    
+
     //preprocess Attribute Selection, ID 4
     public void preprosesAtt(Instances ins) throws Exception { //ini juga udah bisa (Y)
         AttributeSelection inatt = new AttributeSelection();
         inatt.setInputFormat(ins);
-        Instances prepIns = Filter.useFilter(ins,inatt);
+        Instances prepIns = Filter.useFilter(ins, inatt);
         System.out.println("atribut yang digunakan ");
-        for (int i=0; i<prepIns.numAttributes(); i++) {
-            System.out.print(prepIns.attribute(i).name() +" ");
+        for (int i = 0; i < prepIns.numAttributes(); i++) {
+            System.out.print(prepIns.attribute(i).name() + " ");
         }
         System.out.println("");
         matprob(prepIns, 4);
+        makemodel(ins);
     }
-    
-    //===========================process===========================================
-    
-    
+
+    //===========================model===========================================
+    public void makemodel(Instances ins) throws Exception {
+//        ObjectOutputStream oos = new ObjectOutputStream(
+//                new FileOutputStream("NaiveBayes.model"));
+//        oos.writeObject(this);
+//        oos.flush();
+//        oos.close();
+        weka.core.SerializationHelper.writeAll("NaiveBayes.model", new Object[]{this, ins});
+    }
+
+    public void loadmodel() throws Exception {
+//        ObjectInputStream ois = new ObjectInputStream(
+//                           new FileInputStream("NaiveBayes.model"));
+//        BayesNaif nb = (BayesNaif) ois.readObject();
+//        ois.close();
+        Object obj[] = weka.core.SerializationHelper.readAll("NaiveBayes.model");
+        Instances ins = (Instances) obj[1];
+//        for (int i=0; i<20000; i++) {
+//            System.out.println("instance ke-"+(i+1)+" "+ins.instance(i).toString());
+//        }
+    }
+
+    //=======================akurasi===================================
+    public void hitungAkurasi(Instances ins) {
+        float ac = 0;
+        for (int i = 0; i < ins.numInstances(); i++) {
+            banding(ins.instance(i));
+//            System.out.println("huruf "+ins.instance(i).stringValue(0).charAt(0));
+            if (clsf == ins.instance(i).stringValue(0).charAt(0)) {
+                same++;
+            } else {
+                diff++;
+            }
+        }
+        ac = (float) same / (same + diff) * 100;
+        System.out.println("keakuratan " + ac + "%");
+    }
+
+    public void banding(Instance ins) {
+        float[] prb = new float[26];
+        float max = 0;
+        for (int i = 0; i < 26; i++) {
+            prb[i] = plettr[i] * px_box[Integer.parseInt(ins.toString(1))][i]
+                    * py_box[Integer.parseInt(ins.toString(2))][i]
+                    * pwidth[Integer.parseInt(ins.toString(3))][i]
+                    * phigh[Integer.parseInt(ins.toString(4))][i]
+                    * ponpix[Integer.parseInt(ins.toString(5))][i]
+                    * px_bar[Integer.parseInt(ins.toString(6))][i]
+                    * py_bar[Integer.parseInt(ins.toString(7))][i]
+                    * px2bar[Integer.parseInt(ins.toString(8))][i]
+                    * py2bar[Integer.parseInt(ins.toString(9))][i]
+                    * pxybar[Integer.parseInt(ins.toString(10))][i]
+                    * px2ybr[Integer.parseInt(ins.toString(11))][i]
+                    * pxy2br[Integer.parseInt(ins.toString(12))][i]
+                    * px_ege[Integer.parseInt(ins.toString(13))][i]
+                    * pxegvy[Integer.parseInt(ins.toString(14))][i]
+                    * py_ege[Integer.parseInt(ins.toString(15))][i]
+                    * pyegvx[Integer.parseInt(ins.toString(16))][i];
+        }
+        max = carimax(prb);
+    }
+
+    //======================masukkan data baru===============================
+    public void insertDataTest(Instances ins, Instances inssert) {
+        for (int i = 0; i < inssert.numInstances(); i++) {
+            ins.add(inssert.instance(i));
+        }
+        System.out.println("jumlah instance yang baru " + ins.numInstances());
+    }
+
     public static void main(String[] argv) {
         try {
             Instances data = DataSource.read("letter-recognition.arff");
             data.setClass(data.attribute("lettr"));
-            
+
             BayesNaif nb = new BayesNaif();
-            //nb.matprob(data);   
-            nb.preprosesAtt(data);            
+            nb.preprosesDis(data);
+//            for (int i=0; i<26; i++) {
+//                System.out.print(nb.x_box[0][i]+" ");
+//            }
+//            System.out.println("coba bandingkan");
+            //nb.loadmodel();
+//            System.out.println("");
 //            System.out.println("Z "+nb.lettr[25]);
 //            for (int i=0; i<26; i++) {
 //                System.out.println("prob huruf ke-"+(i+1)+" "+nb.plettr[i]);
 //                for (int k=0; k<21; k++) {
-//                    System.out.print(" "+nb.px_bar[k][i]);
+//                    System.out.print(" "+nb.py_bar[k][i]);
 //                }
 //                System.out.println("");
 //            }
-            
+//            
             //buat instances dari dataset
             Instances dataset = DataSource.read("letter - dataset.arff");
             dataset.setClass(dataset.attribute("lettr"));
-            
+
             //buat copy dari dataset yang menyimpan hasil klasifikasi
             Instances labeled = new Instances(dataset);
-            
+
             nb.classfy(dataset);
+
+//            Instances copyData = new Instances(data);
+//            nb.insertDataTest(copyData, dataset);
+//            nb.hitungAkurasi(data);
+//            Result res = new Result();
+//            System.out.println(""+EvalUtil.percentageSplit(nb, dataset, 50 , res));
+//            System.out.println(""+res.getPctCorrect());
+//            System.out.println(""+res.getPctIncorrect());
+
+
 //            System.out.println("nilai max : "+nb.clasIns(dataset.instance(0)));            
 //            System.out.println("class : "+nb.clsf);
-            //iterasi
-//            System.out.println(dataset.numInstances());                                        
-//            for(int i=0;i<dataset.numInstances();i++) {                         
-//                double classLabel = nb.classifyInstance(dataset.instance(i));
-//                labeled.instance(i).setClassValue(classLabel);
-//                System.out.println("klasifikasi instance " + i + " : " + labeled.classAttribute().value((int) classLabel));
-//            }                        
 
-//            for (int i = 0; i < 21; i++) {
-//                System.out.println("nilai-" + i + " ");
-//                for (int j = 0; j < 26; j++) {
-//                    System.out.print(" " + nb.yegvx[i][j]);
-//                }
-//                System.out.println("");
-//            }
 
         } catch (Exception ex) {
             Logger.getLogger(NaiveBayes.class.getName()).log(Level.SEVERE, null, ex);
