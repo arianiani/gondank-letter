@@ -11,7 +11,7 @@
 
     DiskFileUpload fu = new DiskFileUpload();
     // If file size exceeds, a FileUploadException will be thrown
-    fu.setSizeMax(100000000);
+    fu.setSizeMax(10000000);
 
     List fileItems = fu.parseRequest(request);
     Iterator itr = fileItems.iterator();
@@ -31,11 +31,12 @@
         fi.write(fNew);
         
         
-        weka.fileLoader(fNew.getAbsolutePath());
+        weka.dataTestLoader(fNew.getAbsolutePath());
         //for(int i=0;i<weka.dataWeka.numAttributes();i++){
         //    out.println("<input id='check' type='checkbox' name='image[]' id='pilihan' value=''> "+weka.dataWeka.attribute(i).name()+"<br>");
         //}
-        String redirectURL = "Learning.jsp";
+        weka.inputForm = false;
+        String redirectURL = "KlasifikasiResult.jsp";
         response.sendRedirect(redirectURL);
 
         
