@@ -37,6 +37,9 @@ public class WKNNContainer {
             Logger.getLogger(HKNNContainer.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    public WKNNContainer(IBk ibk){
+        mWKNNClassifier = ibk;
+    }
     
     //latih WKNNClassifier dengan trainingSet
     public void trainModel() {

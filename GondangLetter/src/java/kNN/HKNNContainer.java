@@ -41,6 +41,9 @@ public class HKNNContainer {
             Logger.getLogger(HKNNContainer.class.getName()).log(Level.SEVERE, null, ex);
         }
     }        
+    public HKNNContainer(HKNNClassifier mHKNN){
+        mHKNNClassifier = mHKNN;
+    }
     
     //latih HKNNClassifier dengan trainingSet
     public void trainModel() {
