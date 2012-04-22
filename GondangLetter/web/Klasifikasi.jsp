@@ -16,9 +16,15 @@
     </head>
     <body>
         <a href="UploadModel.jsp">Back</a><hr>
-    <form method="post" action="KlasifikasiResult.jsp">
+    <h1>Choose Data Test</h1>
+    <form action="UploadProcessDataTest.jsp" method="post" enctype="multipart/form-data">
+        Input Data Test : &nbsp;&nbsp; <input type="file" name="file_upload"><br>
+        <input type="submit" value="Upload File">
+    </form>        
+    <hr/>
+        <h1>Input Data Manual</h1>
+    <form method="post" action="InputProcessForm.jsp">
         Input data baru :<br> 
-        lettr : <input type="text" name="attr"/><br/>
         x_box : <input type="text" name="attr"/><br/>
         y_box : <input type="text" name="attr"/><br/>
         width : <input type="text" name="attr"/><br/>

@@ -31,15 +31,22 @@
         </select>
         <input type="submit" value="Apply Preproccess" /><br>
     </form>
-        <form method="post" action="Learning.jsp">
+        <form name="myForm" id="myForm" method="post" action="LearningResult.jsp">
 <%
-        
+
     if(weka.dataWeka != null){
-        for(int i=0;i<weka.dataWeka.numAttributes();i++){
-            if(weka.dataWeka.attribute(i)!=null)
-            out.println("<input id='check' type='checkbox' name='image[]' id='pilihan' value=''> "+weka.dataWeka.attribute(i).name()+"<br>");
+        // apply preprocess option
+        if(inputpre.getpreprocessInput()!=null){
+            weka.applyPreprocess(inputpre.getpreprocessInput());
         }
-               }
+        // list the attribute
+        for(int i=0;i<weka.dataWeka.numAttributes();i++){
+            if(weka.dataWeka.attribute(i)!=null){
+                out.println("<input type=\"text\" hidden id=\"checkAttribute"+(i+1)+"\" name=\"checkAttribute\" value=\"1\">");
+                out.println("<input id=\"check\" type=\"checkbox\" checked=\"true\" onclick=\"setClick('checkAttribute"+(i+1)+"')\" name=\"check\" id=\"pilihan"+(i+1)+"\" > "+weka.dataWeka.attribute(i).name()+"<br>");
+           }
+        }
+    }
 
  %>
         Algoritma : <select name="algoritma">
@@ -47,32 +54,76 @@
             <option value="2">Naive Bayes</option>
             <option value="3">ID3</option>
         </select><br>
+        K-NN (diisi jika pilihan algoritmanya K-NN) : <input type="text" name="knn" value="1"/><br/>
         Test Options : (menggunakan Cross Validation dengan jumlah folds 10)<br>
             <input type="submit" value="Start Learning" />
         
     </form>
-<%
-    if(inputlearn.getAlgoritma()!=0 && weka.dataWeka!=null){
-        out.println("<hr>"+weka.classify(inputle));
-    }
-%>
 <script type="text/javascript">
-//$(function() {
-//    $('input[type="checkbox"]').change(function() {
-//        var countchecked = $('input[type="checkbox"]').filter(":checked").length
-//
-//        if (countchecked >= <% //out.println(weka.dataWeka.numAttributes()); %>-1) {
-//            $("input:checkbox").not(":checked").attr("disabled", true);
-//        }else{
-//            $("input:checkbox").attr("disabled", false);
-//        }
+//    $(function() {
+//        $('input[type="checkbox"]').change(function() {
+//            var countchecked = $('input[type="checkbox"]').filter(":checked").length
+//            if (countchecked >= <% //out.println(weka.dataWeka.numAttributes()); %>-1) {
+//                $("input:checkbox").not(":checked").attr("disabled", true);
+//            }else{
+//                $("input:checkbox").attr("disabled", false);
+//            }
+//        });
 //    });
-//});
 </script> 
+ <script type="text/javascript">
+     function setClick(id){
+         if(document.getElementById(id).value==1){
+             document.getElementById(id).value=0;
+         }else {document.getElementById(id).value=1}
+         //alert(document.getElementById(id).value);
+
+//         <%
+         //if(weka.dataWeka != null){
+           // out.println("var jumlah="+weka.dataWeka.numAttributes()+";");
+         %>//
+//         for(var i=1;i<=jumlah;i++){
+//             var text = "pilihan"+i;
+//             if(document.getElementById(text).checked){
+//                 alert(text);
+//                 document.getElementById(text).value="1";
+//             }else{
+//                 alert("salah");
+//             }
+//         }
+//         <%
+         //}
+         %>
+    }
+ </script>
 
 	<div class="bar">
-				<ul class="TGraph">
-				<li class="p1" style="height: 327px; left: 0px;" title="Today, 6 Feb 2007"><p>A</p></li>
+            
+                <%
+                    if(weka.dataWeka!=null){
+                        for(int i=0;i<weka.dataWeka.numAttributes();i++){
+                            //int jumlah = weka.dataWeka.attributeStats(i).nominalCounts.length;
+                            if(weka.dataWeka.attributeStats(i).nominalCounts!=null){
+                                out.println("<h1>Atribut : "+(i+1)+"</h1><ul class=\"TGraph\">");
+                            for(int l=0;l<weka.dataWeka.attributeStats(i).nominalCounts.length;l++){
+                                int index =weka.dataWeka.attributeStats(i).nominalCounts[l];
+                                if(weka.dataWeka.attributeStats(i).nominalCounts[l]<100)
+                                    index*=10;
+                               else{
+                                    index/= weka.dataWeka.attributeStats(i).nominalCounts[l]/100;
+                               }
+                                System.out.println(weka.dataWeka.instance(l).stringValue(i));
+                                out.println("<li class=\"p1\" style=\"height: "+index+
+                                        "px; left: "+(l*50)+"px;\" title=\"Data\"><p>"+weka.dataWeka.instance(l).stringValue(i)+" " +weka.dataWeka.attributeStats(i).nominalCounts[l]+"</p></li>");
+                            }
+                            out.println("</ul>");
+                                                       }else{
+                                //out.println(weka.dataWeka.attributeStats(i));
+                                                       }
+                        }
+                                       }
+                %>
+				<!--<li class="p1" style="height: 327px; left: 0px;" title="Today, 6 Feb 2007"><p>A</p></li>
 				<li class="p2" style="height: 227px; left: 0px;" title="Today, 6 Feb 2007"><p>27</p></li>
 				<li class="p3" style="height: 107px; left: 0px;" title="Today, 6 Feb 2007"><p>A</p></li>
 				<li class="p1" style="height: 87px; left: 0px;" title="Today, 6 Feb 2007"><p>A</p></li>
@@ -134,8 +185,7 @@
 				
 				<li class="p1" style="height: 183px; left: 560px;" title="Tuesday, 23 Jan 2007"><p>183</p></li>
 				<li class="p2" style="height: 130px; left: 560px;" title="Tuesday, 23 Jan 2007"><p>130</p></li>
-				<li class="p3" style="height: 95px; left: 560px;" title="Tuesday, 23 Jan 2007"><p>95</p></li>
-		</ul>
+				<li class="p3" style="height: 95px; left: 560px;" title="Tuesday, 23 Jan 2007"><p>95</p></li>-->
 		
 	</div>
      </body>

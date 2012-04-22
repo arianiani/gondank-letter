@@ -1,3 +1,4 @@
+<%@page import="java.util.ArrayList"%>
 <%@ page import="org.apache.commons.fileupload.DiskFileUpload"%>
 <%@ page import="org.apache.commons.fileupload.FileItem"%>
 <%@ page import="java.util.List"%>
@@ -6,8 +7,9 @@
 
 <jsp:useBean id="weka" class="weka.WekaEngine" scope="session"/>
 <jsp:useBean id="inputpre" class="weka.InputPre" scope="session"/>
-<jsp:useBean id="inputoption" class="weka.InputPre" scope="session"/>
-<jsp:setProperty name="input" property="*" />
+<jsp:useBean id="inputlearn" class="weka.InputLearning" scope="session"/>
+<jsp:setProperty name="inputpre" property="*" />
+<jsp:setProperty name="inputlearn" property="*" />
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
@@ -18,53 +20,41 @@
     </head>
     <body>
         <a href="Upload.jsp">Back</a><hr>
-    <form method="post" action="Learning.jsp">
-        Preproccess : 
-        <select name="preprocessInput">
-            <option value="0">none</option>
-            <option <%if(inputpre.getpreprocessInput()!=null) if(inputpre.getpreprocessInput().equals("1")) out.println("selected='true'");%> value="1">unsupervised discretize</option>
-            <option <%if(inputpre.getpreprocessInput()!=null) if(inputpre.getpreprocessInput().equals("2")) out.println("selected='true'");%> value="2">unsupervised normalize (attribute)</option>
-            <option <%if(inputpre.getpreprocessInput()!=null) if(inputpre.getpreprocessInput().equals("3")) out.println("selected='true'");%> value="3">unsupervised replace missing value</option>
-            <option <%if(inputpre.getpreprocessInput()!=null) if(inputpre.getpreprocessInput().equals("4")) out.println("selected='true'");%> value="4">supervised Attribute Selection</option>
-        </select>
-        <input type="submit" value="Apply Preproccess" /><br>
-    </form>
-        <form>
-<%
-        
-    if(weka.dataWeka != null){
-        for(int i=0;i<weka.dataWeka.numAttributes();i++){
-            if(weka.dataWeka.attribute(i)!=null)
-            out.println("<input id='check' type='checkbox' name='image[]' id='pilihan' value=''> "+weka.dataWeka.attribute(i).name()+"<br>");
+        <table align="center" width="900" border="1">
+            <tr align="center">
+                <td>Weka</td>
+                <td>Our</td>
+            </tr>
+            <tr>
+    <%
+        if(inputlearn.getAlgoritma()!=0 && weka.dataWeka!=null){
+            ArrayList<Integer> getIdx = new ArrayList<Integer>();
+            for(int i=0;i<inputlearn.getCheckAttribute().length;i++){
+                if(Integer.parseInt(inputlearn.getCheckAttribute()[i])==0){
+                    getIdx.add(i);
+                }
+            }
+            int[] remAttr = new int[getIdx.size()];
+            for(int i=0;i<getIdx.size();i++){
+                remAttr[i]=getIdx.get(i);
+                //out.println(remAttr[i]);
+            }
+            out.println(weka.evaluateModel(inputlearn.getAlgoritma(), inputlearn.getKnn(), remAttr));
+        }else {
+            out.println("<td>No algoritma or weka null</td>");
         }
-               }
-
- %>
-        Algoritma : <select>
-            <option>K-NN</option>
-            <option>Naive Bayes</option>
-            <option>ID3</option>
-        </select><br>
-        Test Options : <br>
-            <input type="radio" name="test_option">Cross Validation : <input type="text" value="10"> Folds<br>
-            <input type="radio" name="test_option">Percentage Split : <input type="text" value="80">%<br>
-            k-NN : <input type="text"><br>
-            <input type="submit" value="Start Learning" />
-        
-    </form>
-
-<script type="text/javascript">
-//$(function() {
-//    $('input[type="checkbox"]').change(function() {
-//        var countchecked = $('input[type="checkbox"]').filter(":checked").length
-//
-//        if (countchecked >= <% //out.println(weka.dataWeka.numAttributes()); %>-1) {
-//            $("input:checkbox").not(":checked").attr("disabled", true);
-//        }else{
-//            $("input:checkbox").attr("disabled", false);
-//        }
-//    });
-//});
-</script> 
+    %>
+            </tr>
+        </table>
+            <%        
+            if(inputlearn.getCheckAttribute()!=null){
+                //for(int i=0;i<inputlearn.getCheckAttribute().length;i++){
+                  //  out.println(inputlearn.getCheckAttribute()[i]);
+                
+                //}
+            }else{
+                out.println("tidak ada check");
+            }
+            %>
      </body>
 </html>
