@@ -1,5 +1,4 @@
 package idtree;
-import kNN.*;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -31,28 +30,14 @@ public class WID3Container {
             Remove r = new Remove();
             r.setAttributeIndicesArray(removedAttributes);
             r.setInputFormat(this.trainingSet);
-            this.trainingSet = Filter.useFilter(this.trainingSet, r);                        
-
-            //preproses
-            trainingSet = preprocess.PrepUtil.unsupervisedDiscretize(trainingSet);
-            trainingSet = preprocess.PrepUtil.unsupervisedNumericToNominal(trainingSet);
-            trainingSet = preprocess.PrepUtil.unsupervisedReplaceMissingValue(trainingSet);
-            trainingSet = preprocess.PrepUtil.unsupervisedNormalize(trainingSet);
-             System.out.println(trainingSet.instance(0).stringValue(2));
-            //khusus id3, membutuhkan preproses numerictonominal
-            try {
-                Filter filter = new weka.filters.unsupervised.attribute.NumericToNominal();
-                filter.setInputFormat(trainingSet);
-                Filter.useFilter(trainingSet, filter);
-            } catch (Exception ex) {
-                System.err.println("err : " + ex.getMessage()); 
-            }
+            this.trainingSet = Filter.useFilter(this.trainingSet, r);                                                            
 
             System.out.println("jumlah attribute training set : " + this.trainingSet.numAttributes());
         } catch (Exception ex) {
-            Logger.getLogger(HKNNContainer.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(WID3Container.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    
     public WID3Container(Id3 id3){
         mWID3Classifier = id3;
     }
@@ -81,7 +66,7 @@ public class WID3Container {
             double clsLabel = mWID3Classifier.classifyInstance(data.instance(i));
             labeled.instance(i).setClassValue(clsLabel);            
             if(learn) {
-                //mWID3Classifier.updateClassifier(labeled.instance(i));
+                //FIXME : id3 gak mendukung updateClassifier                
             }
         }               
         
