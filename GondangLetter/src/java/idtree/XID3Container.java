@@ -153,7 +153,7 @@ public class XID3Container {
             try {
                 FileUtil.saveInstances(normdata, "test-normalize.arff");            
             } catch (Exception ex) {            
-            }
+            }                        
             
         } catch (Exception ex) {
             Logger.getLogger(XID3Container.class.getName()).log(Level.SEVERE, null, ex);
