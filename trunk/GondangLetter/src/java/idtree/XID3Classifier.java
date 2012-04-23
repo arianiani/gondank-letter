@@ -126,34 +126,32 @@ public class XID3Classifier extends Id3 {
             }
         }
         return infoGain;
+    }   
+    
+    protected static double xComputeInfoGain(Instances data, Attribute att) {
+        double[] remainders = new double[att.numValues()];
+        
+        for(int i=0;i<att.numValues();i++) {
+            
+        }
+        return 0;
     }
 
-    /**
-     * Computes the entropy of a dataset.
-     *
-     * @param data the data for which entropy is to be computed
-     * @return the entropy of the data's class distribution
-     * @throws Exception if computation fails
-     */
-    //NOTE : sengaja memakai implementasi weka
-    private static double computeEntropy(Instances data) throws Exception {
-
-        double[] classCounts = new double[data.numClasses()];
-        Enumeration instEnum = data.enumerateInstances();
-        while (instEnum.hasMoreElements()) {
-            Instance inst = (Instance) instEnum.nextElement();
-            classCounts[(int) inst.classValue()]++;
-        }
+    protected static double computeEntropy(Instances data) throws Exception {
         double entropy = 0;
-        for (int j = 0; j < data.numClasses(); j++) {
-            if (classCounts[j] > 0) {
-                entropy -= classCounts[j] * Utils.log2(classCounts[j]);
-            }
+        int[] classCounts = new int[data.numClasses()];
+        for(int i=0;i<data.numInstances();i++) {
+            classCounts[(int)data.instance(i).classValue()]++;
         }
-        entropy /= (double) data.numInstances();
-        return entropy + Utils.log2(data.numInstances());
+        
+        for(int i=0;i<data.numClasses();i++) {                        
+            if(classCounts[i] > 0)                
+                entropy -= (classCounts[i]*1.0 / data.numInstances()) * Utils.log2(classCounts[i]*1.0 / data.numInstances()); 
+        }
+        
+        return entropy;
     }
-
+    
     /**
      * Splits a dataset according to the values of a nominal attribute.
      *
@@ -239,6 +237,10 @@ public class XID3Classifier extends Id3 {
 
             xid3.buildClassifier(trainingSet);
             System.out.println(xid3);
+            
+            System.out.println("TEST COMPUTE ENTROPY");            
+            System.out.println("sendiri : " + xid3.computeEntropy(trainingSet));
+            
         } catch (Exception ex) {
             Logger.getLogger(XID3Classifier.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
