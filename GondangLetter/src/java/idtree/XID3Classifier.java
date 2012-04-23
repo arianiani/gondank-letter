@@ -3,7 +3,6 @@ package idtree;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Enumeration;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import weka.classifiers.trees.Id3;
@@ -52,7 +51,7 @@ public class XID3Classifier extends Id3 {
                 if (i == instances.classIndex()) {
                     continue;
                 }
-                double val = computeInfoGain(instances, instances.attribute(i));                
+                double val = calcInfoGain(instances, instances.attribute(i));                
                 if (bestIGValue < val) {
                     bestIGValue = val;
                     bestIGAIndex = instances.attribute(i).index();
@@ -71,7 +70,7 @@ public class XID3Classifier extends Id3 {
                 node.classValue = Utils.maxIndex(node.distribution);
                 node.classAttribute = instances.classAttribute();
             } else {
-                Instances[] childInstances = splitData(instances, node.attribute);
+                Instances[] childInstances = splitDataPerAttValue(instances, node.attribute);
                 node.childs = new Node[node.attribute.numValues()];
                 for (int i = 0; i < node.attribute.numValues(); i++) {
                     Node child = new Node();
@@ -102,42 +101,23 @@ public class XID3Classifier extends Id3 {
             }
             return text.toString();
         }
-    }
-
-    /**
-     * Computes information gain for an attribute.
-     *
-     * @param data the data for which info gain is to be computed
-     * @param att the attribute
-     * @return the information gain for the given attribute and data
-     * @throws Exception if computation fails
-     */
-    //NOTE : sengaja memakai implementasi weka
-    private static double computeInfoGain(Instances data, Attribute att)
-            throws Exception {
-
-        double infoGain = computeEntropy(data);
-        Instances[] splitData = splitData(data, att);
-        for (int j = 0; j < att.numValues(); j++) {
-            if (splitData[j].numInstances() > 0) {
-                infoGain -= ((double) splitData[j].numInstances()
-                        / (double) data.numInstances())
-                        * computeEntropy(splitData[j]);
-            }
-        }
-        return infoGain;
-    }   
+    }       
     
-    protected static double xComputeInfoGain(Instances data, Attribute att) {
+    protected static double calcInfoGain(Instances data, Attribute att) throws Exception {
+        double sumRemainder = 0;
         double[] remainders = new double[att.numValues()];
-        
+        Instances[] splitData = splitDataPerAttValue(data, att);
         for(int i=0;i<att.numValues();i++) {
-            
+            if(splitData[i].numInstances() > 0) {
+                remainders[i] = (splitData[i].numInstances()*1.0 / data.numInstances()) * calcEntropy(splitData[i]);
+                sumRemainder += remainders[i];
+            }            
         }
-        return 0;
+        double infogain = calcEntropy(data) - sumRemainder;
+        return infogain;
     }
 
-    protected static double computeEntropy(Instances data) throws Exception {
+    protected static double calcEntropy(Instances data) throws Exception {
         double entropy = 0;
         int[] classCounts = new int[data.numClasses()];
         for(int i=0;i<data.numInstances();i++) {
@@ -150,32 +130,22 @@ public class XID3Classifier extends Id3 {
         }
         
         return entropy;
+    }       
+    
+    protected static Instances[] splitDataPerAttValue(Instances data, Attribute att) {
+        Instances[] ret = new Instances[att.numValues()];
+        
+        for(int i=0;i<att.numValues();i++) {
+            ret[i] = new Instances(data, 0);
+        }
+        
+        for(int i=0;i<data.numInstances();i++) {            
+            ret[(int)data.instance(i).value(att)].add(data.instance(i));
+        }
+        
+        return ret;
     }
     
-    /**
-     * Splits a dataset according to the values of a nominal attribute.
-     *
-     * @param data the data which is to be split
-     * @param att the attribute to be used for splitting
-     * @return the sets of instances produced by the split
-     */
-    // NOTE : sengaja memakai implementasi weka
-    private static Instances[] splitData(Instances data, Attribute att) {
-
-        Instances[] splitData = new Instances[att.numValues()];
-        for (int j = 0; j < att.numValues(); j++) {
-            splitData[j] = new Instances(data, data.numInstances());
-        }
-        Enumeration instEnum = data.enumerateInstances();
-        while (instEnum.hasMoreElements()) {
-            Instance inst = (Instance) instEnum.nextElement();
-            splitData[(int) inst.value(att)].add(inst);
-        }
-        for (int i = 0; i < splitData.length; i++) {
-            splitData[i].compactify();
-        }
-        return splitData;
-    }
     Node root;
 
     public XID3Classifier() {
@@ -239,8 +209,11 @@ public class XID3Classifier extends Id3 {
             System.out.println(xid3);
             
             System.out.println("TEST COMPUTE ENTROPY");            
-            System.out.println("sendiri : " + xid3.computeEntropy(trainingSet));
+            System.out.println("sendiri : " + xid3.calcEntropy(trainingSet));
             
+            System.out.println("TEST COMPUTE INFO GAIN");
+            System.out.println("sendiri : " + xid3.calcInfoGain(trainingSet, trainingSet.attribute(0)));
+                        
         } catch (Exception ex) {
             Logger.getLogger(XID3Classifier.class.getName()).log(Level.SEVERE, null, ex);
         } finally {

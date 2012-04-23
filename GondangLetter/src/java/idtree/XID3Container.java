@@ -155,6 +155,21 @@ public class XID3Container {
             } catch (Exception ex) {            
             }                        
             
+            Instances voteTrainingSet = FileUtil.loadInstances("vote.arff"); 
+            int voteClassIndex = 16;
+            voteTrainingSet.setClassIndex(voteClassIndex);
+            
+            //replace missing value dulu
+            voteTrainingSet = PrepUtil.unsupervisedReplaceMissingValue(voteTrainingSet);
+            
+            System.out.println("TEST DATA VOTE");
+            XID3Container xid3vote = new XID3Container(voteTrainingSet, removedAttributes, voteClassIndex);
+                                    
+            Result voteTsResult = new Result();
+            System.out.println(EvalUtil.useTrainingSet(xid3vote.getClassifier(), xid3vote.getTrainingSet(), voteTsResult));            
+            System.out.println("akurasi (benar - salah) : " + voteTsResult.getPctCorrect() + " - " + voteTsResult.getPctIncorrect());
+            
+            
         } catch (Exception ex) {
             Logger.getLogger(XID3Container.class.getName()).log(Level.SEVERE, null, ex);
         }
