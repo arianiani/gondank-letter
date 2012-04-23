@@ -2248,6 +2248,7 @@ public class BayesNaif extends NaiveBayes {
 //        oos.flush();
 //        oos.close();
         weka.core.SerializationHelper.writeAll("NaiveBayes.model", new Object[]{this, ins});
+        System.out.println("Model disimpan ke dalam NaiveBayes.model");
     }
 
     public void loadmodel() throws Exception {
@@ -2303,11 +2304,25 @@ public class BayesNaif extends NaiveBayes {
     }
 
     //======================masukkan data baru===============================
-    public void insertDataTest(Instances ins, Instances inssert) {
+    public void insertDataTest(Instances ins, Instances inssert) throws Exception {
         for (int i = 0; i < inssert.numInstances(); i++) {
             ins.add(inssert.instance(i));
         }
         System.out.println("jumlah instance yang baru " + ins.numInstances());
+        switch(ID) {
+            case 1:
+                preprosesDis(ins);
+                break;
+            case 2:
+                preprosesNor(ins);
+                break;
+            case 3:
+                preprosesRep(ins);
+                break;
+            case 4:
+                preprosesAtt(ins);
+                break;
+        }
     }
 
     public static void main(String[] argv) {
@@ -2316,7 +2331,7 @@ public class BayesNaif extends NaiveBayes {
             data.setClass(data.attribute("lettr"));
 
             BayesNaif nb = new BayesNaif();
-            nb.preprosesDis(data);
+            nb.preprosesRep(data);
 //            for (int i=0; i<26; i++) {
 //                System.out.print(nb.x_box[0][i]+" ");
 //            }
@@ -2341,8 +2356,8 @@ public class BayesNaif extends NaiveBayes {
 
             nb.classfy(dataset);
 
-//            Instances copyData = new Instances(data);
-//            nb.insertDataTest(copyData, dataset);
+            Instances copyData = new Instances(data);
+            nb.insertDataTest(copyData, dataset);
 //            nb.hitungAkurasi(data);
 //            Result res = new Result();
 //            System.out.println(""+EvalUtil.percentageSplit(nb, dataset, 50 , res));
