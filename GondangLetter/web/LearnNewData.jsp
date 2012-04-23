@@ -17,7 +17,7 @@
     <%    
         if(weka.dataWeka!=null)
             weka.classify(true);
-        String redirectURL = "index.jsp";
+        String redirectURL = "Learning.jsp";
         response.sendRedirect(redirectURL);
         
      %>
