@@ -342,6 +342,7 @@ public class WekaEngine {
                 // deserialize model
                 HKNNClassifier hccl = (HKNNClassifier) weka.core.SerializationHelper.read(wekaFile);
                 HKNNContainer hcc = new HKNNContainer(hccl);
+
                 Instances testdata=null;
                 try {
                     testdata = FileUtil.loadInstances(dataTestFile);
